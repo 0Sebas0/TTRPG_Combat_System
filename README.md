@@ -1,2 +1,2 @@
-# TTRPG_Combat_System
+# TTRPG Combat System
 Combat system for Dungeons &amp; Dragons TTRPG

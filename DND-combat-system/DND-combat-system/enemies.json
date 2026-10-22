@@ -1,0 +1,24 @@
+[
+  {
+    "name": "Goblin",
+    "maxHp": 7,
+    "armorClass": 15,
+    "initiativeModifier": 2,
+    "attacks": [
+      { "name": "Scimitar", "bonusToHit": 4, "damageBonus": 2, "damageType": "Slashing", "damage": { "count": 1, "sides": 6 } }
+    ],
+    "resistances": []
+  },
+  {
+    "name": "Skeleton",
+    "maxHp": 13,
+    "armorClass": 13,
+    "initiativeModifier": 2,
+    "attacks": [
+      { "name": "Shortsword", "bonusToHit": 4, "damageBonus": 2, "damageType": "Piercing", "damage": { "count": 1, "sides": 6 } }
+    ],
+    "resistances": [
+      { "damageType": "Bludgeoning", "resistanceLevel": "Vulnerability" }
+    ]
+  }
+]

@@ -3,7 +3,6 @@
     "name": "Thorin",
     "maxHp": 28,
     "armorClass": 17,
-    "initiativeModifier": 1,
     "attacks": [
       {
         "name": "Longsword",
@@ -16,17 +15,18 @@
         }
       }
     ],
-    "resistances": []
+    "resistances": [],
+    "initiativeModifier": 1
   },
   {
     "name": "Elara",
     "maxHp": 16,
     "armorClass": 12,
-    "initiativeModifier": 2,
     "attacks": [
       {
         "name": "Fire Bolt",
         "bonusToHit": 5,
+        "damageBonus": 0,
         "damageType": "Fire",
         "damage": {
           "count": 1,
@@ -39,13 +39,13 @@
         "damageType": "Fire",
         "resistanceLevel": "Resistance"
       }
-    ]
+    ],
+    "initiativeModifier": 2
   },
   {
     "name": "Pranas",
     "maxHp": 8,
     "armorClass": 11,
-    "initiativeModifier": 0,
     "attacks": [
       {
         "name": "Dagger",
@@ -68,13 +68,13 @@
         }
       }
     ],
-    "resistances": []
+    "resistances": [],
+    "initiativeModifier": 0
   },
   {
     "name": "Varliavaris",
     "maxHp": 9,
     "armorClass": 8,
-    "initiativeModifier": -2,
     "attacks": [
       {
         "name": "Spear",
@@ -97,6 +97,41 @@
         }
       }
     ],
-    "resistances": []
+    "resistances": [],
+    "initiativeModifier": -2
+  },
+  {
+    "name": "Vakaris",
+    "maxHp": 8,
+    "armorClass": 15,
+    "attacks": [
+      {
+        "name": "Punch",
+        "bonusToHit": 4,
+        "damageBonus": 2,
+        "damageType": "Bludgeoning",
+        "damage": {
+          "count": 1,
+          "sides": 4
+        }
+      },
+      {
+        "name": "Pumpis kaip kumpis",
+        "bonusToHit": 1,
+        "damageBonus": 0,
+        "damageType": "Psychic",
+        "damage": {
+          "count": 1,
+          "sides": 12
+        }
+      }
+    ],
+    "resistances": [
+      {
+        "damageType": "Psychic",
+        "resistanceLevel": "Vulnerability"
+      }
+    ],
+    "initiativeModifier": -3
   }
 ]

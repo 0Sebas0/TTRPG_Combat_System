@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("DND-combat-system")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+1ec5cac1a5b71ac1087979724102bf068cadc323")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+fb095a854a0a9a4181512b5d7ed65e6e09c0cf59")]
 [assembly: System.Reflection.AssemblyProductAttribute("DND-combat-system")]
 [assembly: System.Reflection.AssemblyTitleAttribute("DND-combat-system")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

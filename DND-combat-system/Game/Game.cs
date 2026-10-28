@@ -221,6 +221,7 @@ class Game
         while (run)
         {
             Console.Clear();
+            Console.Write("\x1b[3J");
             _interface.CharacterSelectionUI(_availableCharacters, _playerTeam);
 
             var key = Console.ReadKey(true);

@@ -9,6 +9,8 @@ class Game
     private LinkedList<Character> _playerTeam = new();
     private LinkedList<Character> _enemyTeam = new();
     private UI _interface = new UI();
+    private int _page = 0;
+    private const int PageSize = 9;
     public Game()
     {
         ReadJson();
@@ -263,3 +265,6 @@ class Game
         CharacterSelection();
     }
 }
+
+// TODO:
+// Implement available character selection list paging

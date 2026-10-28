@@ -1,0 +1,102 @@
+[
+  {
+    "name": "Thorin",
+    "maxHp": 28,
+    "armorClass": 17,
+    "initiativeModifier": 1,
+    "attacks": [
+      {
+        "name": "Longsword",
+        "bonusToHit": 5,
+        "damageBonus": 2,
+        "damageType": "Slashing",
+        "damage": {
+          "count": 1,
+          "sides": 8
+        }
+      }
+    ],
+    "resistances": []
+  },
+  {
+    "name": "Elara",
+    "maxHp": 16,
+    "armorClass": 12,
+    "initiativeModifier": 2,
+    "attacks": [
+      {
+        "name": "Fire Bolt",
+        "bonusToHit": 5,
+        "damageType": "Fire",
+        "damage": {
+          "count": 1,
+          "sides": 10
+        }
+      }
+    ],
+    "resistances": [
+      {
+        "damageType": "Fire",
+        "resistanceLevel": "Resistance"
+      }
+    ]
+  },
+  {
+    "name": "Pranas",
+    "maxHp": 8,
+    "armorClass": 11,
+    "initiativeModifier": 0,
+    "attacks": [
+      {
+        "name": "Dagger",
+        "bonusToHit": 2,
+        "damageBonus": 0,
+        "damageType": "Piercing",
+        "damage": {
+          "count": 1,
+          "sides": 4
+        }
+      },
+      {
+        "name": "Shortsword",
+        "bonusToHit": 2,
+        "damageBonus": 0,
+        "damageType": "Slashing",
+        "damage": {
+          "count": 1,
+          "sides": 6
+        }
+      }
+    ],
+    "resistances": []
+  },
+  {
+    "name": "Varliavaris",
+    "maxHp": 9,
+    "armorClass": 8,
+    "initiativeModifier": -2,
+    "attacks": [
+      {
+        "name": "Spear",
+        "bonusToHit": 2,
+        "damageBonus": 0,
+        "damageType": "Piercing",
+        "damage": {
+          "count": 1,
+          "sides": 6
+        }
+      },
+      {
+        "name": "Crossbow",
+        "bonusToHit": 0,
+        "damageBonus": -2,
+        "damageType": "Slashing",
+        "damage": {
+          "count": 1,
+          "sides": 8
+        }
+      }
+    ],
+    "resistances": []
+  }
+]

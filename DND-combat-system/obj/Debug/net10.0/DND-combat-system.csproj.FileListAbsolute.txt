@@ -13,3 +13,6 @@ C:\Users\zaidi\source\repos\DND-combat-system\DND-combat-system\obj\Debug\net10.
 C:\Users\zaidi\source\repos\DND-combat-system\DND-combat-system\obj\Debug\net10.0\DND-combat-system.genruntimeconfig.cache
 C:\Users\zaidi\source\repos\DND-combat-system\DND-combat-system\obj\Debug\net10.0\ref\DND-combat-system.dll
 C:\Users\zaidi\source\repos\DND-combat-system\DND-combat-system\obj\Debug\net10.0\DND-comb.136AB90C.Up2Date
+C:\Users\zaidi\source\repos\DND-combat-system\DND-combat-system\bin\Debug\net10.0\characters.json
+C:\Users\zaidi\source\repos\DND-combat-system\DND-combat-system\bin\Debug\net10.0\enemies.json
+C:\Users\zaidi\source\repos\DND-combat-system\DND-combat-system\obj\Debug\net10.0\DND-combat-system.sourcelink.json

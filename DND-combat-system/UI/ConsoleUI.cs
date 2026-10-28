@@ -1,4 +1,4 @@
-﻿namespace main;
+﻿namespace RpgBattle;
 class UI
 {
     public void CharacterSelectionUI(List<Character> availableCharacters, LinkedList<Character> playerTeam)

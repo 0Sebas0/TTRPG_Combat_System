@@ -1,4 +1,4 @@
-﻿namespace main;
+﻿namespace RpgBattle;
 using System.Text.Json.Serialization;
 
 class Character

@@ -1,4 +1,4 @@
-﻿namespace RpgBattle;
+﻿namespace main;
 
     class Program
     {

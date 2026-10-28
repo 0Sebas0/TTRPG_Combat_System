@@ -1,4 +1,4 @@
-﻿namespace RpgBattle;
+﻿namespace main;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 

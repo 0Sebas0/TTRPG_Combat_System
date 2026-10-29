@@ -1,43 +1,49 @@
 ﻿namespace RpgBattle;
+
 class UI
 {
-    public void CharacterSelectionUI(List<Character> availableCharacters, LinkedList<Character> playerTeam)
+    public void CharacterSelectionUI(List<Character> availableCharacters, LinkedList<Character> playerTeam, int page, int pageSize)
     {
         Console.WriteLine("-------------------- SELECT YOUR FIGHTERS --------------------");
-        ShowAvailableCharacters(availableCharacters, playerTeam);
+        ShowAvailableCharacters(availableCharacters, playerTeam, page, pageSize);
         Console.WriteLine("--------------------------------------------------------------");
         Console.WriteLine();
         ShowChosencharacters(playerTeam);
         Console.WriteLine();
         Console.WriteLine("--------------------------------------------------------------");
-        ShowCharacterSelectionControls(availableCharacters);
+        ShowCharacterSelectionControls(availableCharacters, page, pageSize);
         Console.WriteLine();
 
     }
-    public void ShowAvailableCharacters(List<Character> availableCharacters, LinkedList<Character> playerTeam)
+    public void ShowAvailableCharacters(List<Character> availableCharacters, LinkedList<Character> playerTeam, int page, int pageSize)
     {
-        int num = 1;
-        foreach (Character character in availableCharacters)
+        int start = page * pageSize;
+        int end = Math.Min(start + pageSize, availableCharacters.Count);
+
+        for (int i = start; i < end; i++)
         {
             bool selected = false;
             foreach (Character character2 in playerTeam)
             {
-                if (character2.Name == character.Name)
+                if (character2.Name == availableCharacters[i].Name)
                 {
                     selected = true;
                     break;
                 }
             }
+            int num = i - start + 1;
             if (selected)
             {
-                Console.WriteLine($"{num}. {character.Name} (selected)");
+                Console.WriteLine($"{num}. {availableCharacters[i].Name} (selected)");
             }
             else
             {
-                Console.WriteLine($"{num}. {character.Name}");
+                Console.WriteLine($"{num}. {availableCharacters[i].Name}");
             }
-            num++;
         }
+        int pageCount = Math.Max(1, (availableCharacters.Count + pageSize - 1) / pageSize);
+        Console.WriteLine();
+        Console.WriteLine($"Page {page + 1}/{pageCount}");
     }
     public void ShowChosencharacters(LinkedList<Character> playerTeam)
     {
@@ -48,9 +54,10 @@ class UI
         }
         Console.WriteLine();
     }
-    public void ShowCharacterSelectionControls(List<Character> availableCharacters)
+    public void ShowCharacterSelectionControls(List<Character> availableCharacters, int page, int pageSize)
     {
-        Console.WriteLine($"[1-{availableCharacters.Count()}] Pick character [I] Inspect [D] Remove last pick [C] Create a character [N] Next");
+        int onPage = Math.Min(pageSize, availableCharacters.Count - page * pageSize);
+        Console.WriteLine($"[1-{onPage}] Pick  [<-/->] Page  [I] Inspect  [D] Remove last  [C] Create  [N] Next");
     }
     public void ShowCharacterStats(Character c)
     {

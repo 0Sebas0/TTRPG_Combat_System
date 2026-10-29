@@ -9,6 +9,9 @@ class Game
     private LinkedList<Character> _playerTeam = new();
     private LinkedList<Character> _enemyTeam = new();
     private UI _interface = new UI();
+    private int _page = 0;
+    private const int PageSize = 9;
+    private int PageCount() => Math.Max(1, (_availableCharacters.Count + PageSize - 1) / PageSize);
     public Game()
     {
         ReadJson();
@@ -73,10 +76,10 @@ class Game
     {
         index = -1;
 
-        if (!char.IsDigit(keyChar)) return false;
+        if (keyChar < '1' || keyChar > '9') return false;
 
-        index = (keyChar - '0') - 1;
-        return index >= 0 && index < listSize;
+        index = _page * PageSize + (keyChar-'1');
+        return index < listSize;
     }
     private bool IsSelected(Character character)
     {
@@ -88,7 +91,8 @@ class Game
     }
     private void InspectCharacter(List<Character> availableCharacters)
     {
-        Console.WriteLine($"Which character you want to inspect? [1-{availableCharacters.Count()}]");
+        int onPage = Math.Min(PageSize, availableCharacters.Count - _page * PageSize);
+        Console.WriteLine($"Which character you want to inspect? [1-{onPage}]");
         var key = Console.ReadKey(true);
         int index;
         if (TryGetIndex(key.KeyChar, availableCharacters.Count, out index))
@@ -222,9 +226,20 @@ class Game
         {
             Console.Clear();
             Console.Write("\x1b[3J");
-            _interface.CharacterSelectionUI(_availableCharacters, _playerTeam);
+            _interface.CharacterSelectionUI(_availableCharacters, _playerTeam, _page, PageSize);
 
             var key = Console.ReadKey(true);
+
+            if(key.Key == ConsoleKey.RightArrow)
+            {
+                if (_page < PageCount()-1) _page++;
+                continue;
+            }
+            if(key.Key == ConsoleKey.LeftArrow)
+            {
+                if(_page > 0) _page--;
+                continue;
+            }
 
             int index;
 
@@ -251,6 +266,7 @@ class Game
                         _availableCharacters.Add(created);
                         SaveToFile("characters.json", _availableCharacters);
                         _playerTeam.AddLast(created.Clone());
+                        _page = PageCount() - 1;
                     }
                     break;
                 case 'n':

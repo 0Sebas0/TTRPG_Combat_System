@@ -248,7 +248,6 @@ class Game
                 _playerTeam.AddLast(_availableCharacters[index].Clone());
             }
 
-
             char keyBind = char.ToLower(key.KeyChar);
 
             switch (keyBind)

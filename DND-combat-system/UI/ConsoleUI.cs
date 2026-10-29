@@ -19,7 +19,7 @@ class UI
     {
         int start = page * pageSize;
         int end = Math.Min(start + pageSize, availableCharacters.Count);
-
+        int num = 0;
         for (int i = start; i < end; i++)
         {
             bool selected = false;
@@ -31,7 +31,7 @@ class UI
                     break;
                 }
             }
-            int num = i - start + 1;
+            num = i - start + 1;
             if (selected)
             {
                 Console.WriteLine($"{num}. {availableCharacters[i].Name} (selected)");
@@ -40,6 +40,10 @@ class UI
             {
                 Console.WriteLine($"{num}. {availableCharacters[i].Name}");
             }
+        }
+        for(int i = 0; i<pageSize-num; i++)
+        {
+            Console.WriteLine();
         }
         int pageCount = Math.Max(1, (availableCharacters.Count + pageSize - 1) / pageSize);
         Console.WriteLine();

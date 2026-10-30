@@ -1,13 +1,14 @@
 ﻿namespace RpgBattle;
+
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 class Game
 {
-    private List<Character> _availableCharacters = new();
-    private List<Character> _availableEnemies = new();
-    private LinkedList<Character> _playerTeam = new();
-    private LinkedList<Character> _enemyTeam = new();
+    private List<Player> _availableCharacters = new();
+    private List<Enemy> _availableEnemies = new();
+    private LinkedList<Player> _playerTeam = new();
+    private LinkedList<Enemy> _enemyTeam = new();
     private UI _interface = new UI();
     private int _page = 0;
     private const int PageSize = 9;
@@ -27,30 +28,30 @@ class Game
 
     private void ReadJson()
     {
-        _availableCharacters = LoadFromFile("characters.json");
-        _availableEnemies = LoadFromFile("enemies.json");
+        _availableCharacters = LoadFromFile<Player>("characters.json");
+        _availableEnemies = LoadFromFile<Enemy>("enemies.json");
     }
-    private List<Character> LoadFromFile(string path)
+    private List<T> LoadFromFile<T>(string path) where T : Character
     {
         if (!File.Exists(path))
         {
             Console.WriteLine($"File not found: {path}");
-            return new List<Character>();
+            return new List<T>();
         }
 
         try
         {
             string json = File.ReadAllText(path);
-            return JsonSerializer.Deserialize<List<Character>>(json, _jsonOptions)
-                   ?? new List<Character>();
+            return JsonSerializer.Deserialize<List<T>>(json, _jsonOptions)
+                   ?? new List<T>();
         }
         catch (JsonException ex)
         {
             Console.WriteLine($"Bad JSON in {path}: {ex.Message}");
-            return new List<Character>();
+            return new List<T>();
         }
     }
-    private void SaveToFile(string path, List<Character> characters)
+    private void SaveToFile(string path, List<Player> characters)
     {
         try
         {
@@ -78,7 +79,7 @@ class Game
 
         if (keyChar < '1' || keyChar > '9') return false;
 
-        index = _page * PageSize + (keyChar-'1');
+        index = _page * PageSize + (keyChar - '1');
         return index < listSize;
     }
     private bool IsSelected(Character character)
@@ -89,7 +90,7 @@ class Game
         }
         return false;
     }
-    private void InspectCharacter(List<Character> availableCharacters)
+    private void InspectCharacter(List<Player> availableCharacters)
     {
         int onPage = Math.Min(PageSize, availableCharacters.Count - _page * PageSize);
         Console.WriteLine($"Which character you want to inspect? [1-{onPage}]");
@@ -101,7 +102,7 @@ class Game
         }
 
     }
-    private Character? CreateCustomCharacter()
+    private Player? CreateCustomCharacter()
     {
         while (true) // repeats only if the player chooses "Redo"
         {
@@ -117,7 +118,7 @@ class Game
             List<Attack> attacks = AskAttacks();
             List<Resistance> resistances = AskResistances();
 
-            Character character = new Character(name, hp, ac, initiativeMod, attacks, resistances);
+            Player character = new Player(name, hp, ac, initiativeMod, attacks, resistances);
 
             _interface.ShowCharacterStats(character); // shows a summary and waits for a key
 
@@ -230,20 +231,20 @@ class Game
 
             var key = Console.ReadKey(true);
 
-            if(key.Key == ConsoleKey.RightArrow)
+            if (key.Key == ConsoleKey.RightArrow)
             {
-                if (_page < PageCount()-1) _page++;
+                if (_page < PageCount() - 1) _page++;
                 continue;
             }
-            if(key.Key == ConsoleKey.LeftArrow)
+            if (key.Key == ConsoleKey.LeftArrow)
             {
-                if(_page > 0) _page--;
+                if (_page > 0) _page--;
                 continue;
             }
 
             int index;
 
-            if (TryGetIndex(key.KeyChar, _availableCharacters.Count(), out index) && !IsSelected(_availableCharacters[index]))
+            if (TryGetIndex(key.KeyChar, _availableCharacters.Count, out index) && !IsSelected(_availableCharacters[index]))
             {
                 _playerTeam.AddLast(_availableCharacters[index].Clone());
             }
@@ -259,7 +260,7 @@ class Game
                     InspectCharacter(_availableCharacters);
                     break;
                 case 'c':
-                    Character? created = CreateCustomCharacter();
+                    Player? created = CreateCustomCharacter();
                     if (created != null)
                     {
                         _availableCharacters.Add(created);
@@ -268,10 +269,33 @@ class Game
                         _page = PageCount() - 1;
                     }
                     break;
-                case 'n':
-                    if (_playerTeam.Count > 0) run = false;
+                case 'p':
+                    if (_playerTeam.Count > 0) Battle();
+                    break;
+                case 'e':
+                    run = false;
                     break;
             }
+        }
+    }
+    private void Battle()
+    {
+        GenerateEnemies();
+        while (true)
+        {
+            Console.Clear();
+            _interface.BattleUI(_playerTeam, _enemyTeam);
+            Console.ReadKey();
+        }
+    }
+    private void GenerateEnemies()
+    {
+        var rand = new Random();
+        int count = rand.Next(1, 10);
+        for (int i = 0; i < count; i++)
+        {
+            int index = rand.Next(0, _availableEnemies.Count);
+            _enemyTeam.AddLast(_availableEnemies[index].Clone());
         }
     }
     public void Run()

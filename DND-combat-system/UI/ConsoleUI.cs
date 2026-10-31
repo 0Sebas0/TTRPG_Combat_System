@@ -320,14 +320,11 @@ class UI
             number++;
         }
     }
-
-    public void ShowTargets<T>(LinkedList<T> targets) where T : Character
+    public void ShowTargets(List<Character> targets)
     {
-        int num = 1;
-        foreach(Character character in targets)
+        for (int i = 0; i < targets.Count; i++)
         {
-            Console.WriteLine($"[{num}] {character.Name}");
-            num++;
+            Console.WriteLine($"[{i + 1}] {targets[i].Name}  HP {targets[i].CurrentHp}/{targets[i].MaxHp}");
         }
     }
 

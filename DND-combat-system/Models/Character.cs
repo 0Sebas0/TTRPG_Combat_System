@@ -72,7 +72,13 @@ abstract class Character
     }
     public int RollDamage(Attack attack)
     {
-        return attack.Damage.Count * Random.Shared.Next(1, attack.Damage.Sides + 1) + attack.DamageBonus;
+        int damage = 0;
+        for(int i = 0; i< attack.Damage.Count;i++)
+        {
+            damage += Random.Shared.Next(1, attack.Damage.Sides + 1);
+        }
+        damage += attack.DamageBonus;
+        return damage;
     }
     public void RollForInitiative()
     {

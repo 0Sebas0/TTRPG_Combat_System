@@ -281,20 +281,47 @@ class Game
     private void Battle()
     {
         GenerateEnemies();
-        while (true)
+        bool run = true;
+        while (run)
         {
             Console.Clear();
+            Console.Write("\x1b[3J");
             _interface.BattleUI(_playerTeam, _enemyTeam);
-            Console.ReadKey();
+            char key = char.ToLower(Console.ReadKey(true).KeyChar);
+
+            switch(key)
+            {
+                case 'e':
+                    _enemyTeam.Clear();
+                    run = false;
+                    break;
+                case 'r':
+                    _enemyTeam.Clear();
+                    GenerateEnemies();
+                    break;
+            }
         }
     }
     private void GenerateEnemies()
     {
-        var rand = new Random();
-        int count = rand.Next(1, 10);
+        if(Random.Shared.Next(1, 101) == 67)
+        {
+            Attack Scythe = new Attack("Scythe", 3, 3, DamageType.Slashing, new DiceRoll(1, 12));
+            Attack Shitarmagedon = new Attack("Shitarmagedon", 3, 3, DamageType.Acid, new DiceRoll(10, 10));
+            List<Attack> attacks = new List<Attack>();
+
+            attacks.Add(Shitarmagedon);
+            attacks.Add(Scythe);
+
+            Enemy Boss = new Enemy("SHIT DEMON", 98, 16, 5, attacks, new List<Resistance>());
+            _enemyTeam.AddLast(Boss);
+            return;
+        }
+        
+        int count = Random.Shared.Next(1, 3*_playerTeam.Count+1);
         for (int i = 0; i < count; i++)
         {
-            int index = rand.Next(0, _availableEnemies.Count);
+            int index = Random.Shared.Next(0, _availableEnemies.Count);
             _enemyTeam.AddLast(_availableEnemies[index].Clone());
         }
     }

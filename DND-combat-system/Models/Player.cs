@@ -19,7 +19,21 @@ class Player : Character
     }
     public void RollDeathSave()
     {
+        int roll = Random.Shared.Next(1, 21);
+        if (roll == 20)
+        {
+            Heal(1);
+            DeathSaveSuccesses = DeathSaveFailures = 0;
+        }
+        else if (roll == 1) DeathSaveFailures += 2;
+        else if (roll >= 10) DeathSaveSuccesses++;
+        else DeathSaveFailures++;
 
+        if(DeathSaveSuccesses == 3)
+        {
+            Heal(1);
+            DeathSaveSuccesses = DeathSaveFailures = 0;
+        }
     }
 }
 

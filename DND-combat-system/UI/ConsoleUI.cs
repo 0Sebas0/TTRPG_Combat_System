@@ -61,7 +61,7 @@ class UI
     public void ShowCharacterSelectionControls(List<Player> availableCharacters, int page, int pageSize)
     {
         int onPage = Math.Min(pageSize, availableCharacters.Count - page * pageSize);
-        Console.WriteLine($"[1-{onPage}] Pick  [<-/->] Page  [I] Inspect  [D] Remove last  [C] Create  [E] Exit");
+        Console.WriteLine($"[1-{onPage}] Pick  [<-/->] Page  [I] Inspect  [D] Remove last  [C] Create [P] Play [E] Exit");
     }
     public void ShowCharacterStats(Player c)
     {
@@ -233,7 +233,7 @@ class UI
         int choice = AskInt("Choose", 1, 3);
         return (ResistanceLevel)(choice - 1); // enum values start at 0: Resistance=0, Vulnerability=1, Immunity=2
     }
-    public void ShowHealthBar<T>(T c, int width = 20) where T : Character
+    public void ShowHealthBar<T>(T c, int width) where T : Character
     {
         double ratio = (double)c.CurrentHp / c.MaxHp;
         int filled = (int)Math.Round(ratio * width);
@@ -266,12 +266,12 @@ class UI
                 if (!c.IsDown)
                 {
                     Console.Write($"{c.Name,-12}[");
-                    ShowHealthBar(c);
+                    ShowHealthBar(c, c.MaxHp);
                 }
-                else if (c.IsDown)
+                else if (c.IsDown && c is Player)
                 {
-                    Console.Write($"(Unconscious) {c.Name,-12}[");
-                    ShowHealthBar(c);
+                    Console.Write($"(Unconscious) {c.Name,-20}[");
+                    ShowHealthBar(c, c.MaxHp);
                 }
 
                 Console.WriteLine();

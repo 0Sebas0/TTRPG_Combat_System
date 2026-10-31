@@ -66,9 +66,13 @@ abstract class Character
         if (amount < 0) return;
         CurrentHp = Math.Min(MaxHp, CurrentHp + amount);
     }
-    public int RollForAttack(Attack attack)
+    public int RollToHit(Attack attack)
     {
         return Random.Shared.Next(1, 21) + attack.BonusToHit;
+    }
+    public int RollDamage(Attack attack)
+    {
+        return attack.Damage.Count * Random.Shared.Next(1, attack.Damage.Sides + 1) + attack.DamageBonus;
     }
     public void RollForInitiative()
     {

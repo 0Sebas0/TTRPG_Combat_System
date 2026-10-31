@@ -5,7 +5,45 @@
     "armorClass": 15,
     "initiativeModifier": 2,
     "attacks": [
-      { "name": "Scimitar", "bonusToHit": 4, "damageBonus": 2, "damageType": "Slashing", "damage": { "count": 1, "sides": 6 } }
+      {
+        "name": "Scimitar",
+        "bonusToHit": 4,
+        "damageBonus": 2,
+        "damageType": "Slashing",
+        "damage": {
+          "count": 1,
+          "sides": 6
+        }
+      }
+    ],
+    "resistances": []
+  },
+  {
+    "name": "Orc Shaman",
+    "maxHp": 10,
+    "armorClass": 15,
+    "initiativeModifier": 2,
+    "attacks": [
+      {
+        "name": "Fire Bolt",
+        "bonusToHit": 4,
+        "damageBonus": 2,
+        "damageType": "Fire",
+        "damage": {
+          "count": 1,
+          "sides": 10
+        }
+      },
+      {
+        "name": "Spell of Sloth",
+        "bonusToHit": 4,
+        "damageBonus": 2,
+        "damageType": "Slow",
+        "damage": {
+          "count": 1,
+          "sides": 4
+        }
+      }
     ],
     "resistances": []
   },
@@ -15,10 +53,23 @@
     "armorClass": 13,
     "initiativeModifier": 2,
     "attacks": [
-      { "name": "Shortsword", "bonusToHit": 4, "damageBonus": 2, "damageType": "Piercing", "damage": { "count": 1, "sides": 6 } }
+      {
+        "name": "Shortsword",
+        "bonusToHit": 4,
+        "damageBonus": 2,
+        "damageType": "Piercing",
+        "damage": {
+          "count": 1,
+          "sides": 6
+        }
+      }
+
     ],
     "resistances": [
-      { "damageType": "Bludgeoning", "resistanceLevel": "Vulnerability" }
+      {
+        "damageType": "Bludgeoning",
+        "resistanceLevel": "Vulnerability"
+      }
     ]
   }
 ]

@@ -278,7 +278,7 @@ class UI
             }
         }
     }
-    public void BattleUI(LinkedList<Player> playerTeam, LinkedList<Enemy> enemyTeam)
+    public void BattleUI(LinkedList<Player> playerTeam, LinkedList<Enemy> enemyTeam, Queue<Character> turnOrder, Character current)
     {
         Console.WriteLine("--------------------------- BATTLE ---------------------------");
         Console.WriteLine();
@@ -288,6 +288,47 @@ class UI
         ShowAliveCharacters(playerTeam);
         Console.WriteLine();
         Console.WriteLine("--------------------------------------------------------------");
+        ShowTurnOrder(turnOrder);
+        Console.WriteLine();
+        Console.WriteLine($"Its {current.Name}'s turn.");
+    }
+    public void ShowTurnOrder(Queue<Character> turnOrder)
+    {
+        Console.Write("Turn Order: ");
+        foreach(Character character in turnOrder)
+        {
+            Console.Write($"[{character.Name}] ");
+        }
+        Console.WriteLine();
+    }
+    public void ShowCharacterAttacks(Character character, bool staticTurnOrder)
+    {
+        int number = 1;
+
+        foreach (Attack attack in character.Attacks)
+        {
+            Console.Write($"[{number}] {attack.Name} ATK");
+            if (attack.BonusToHit >= 0) Console.Write('+');
+            Console.Write($"{attack.BonusToHit} ");
+            Console.Write($"{attack.Damage.Count}d{attack.Damage.Sides}");
+            if (attack.DamageBonus > 0) Console.Write("+");
+            if (attack.DamageBonus != 0) Console.Write($"{attack.DamageBonus}"); 
+            Console.Write($" {attack.DamageType}");
+            if (staticTurnOrder && (attack.DamageType == DamageType.Slow || attack.DamageType == DamageType.Haste)) Console.WriteLine("(no effect)");
+            else Console.WriteLine();
+
+            number++;
+        }
+    }
+
+    public void ShowTargets<T>(LinkedList<T> targets) where T : Character
+    {
+        int num = 1;
+        foreach(Character character in targets)
+        {
+            Console.WriteLine($"[{num}] {character.Name}");
+            num++;
+        }
     }
 
 }

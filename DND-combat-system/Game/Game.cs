@@ -1,5 +1,7 @@
 ﻿namespace RpgBattle;
 
+using System.Net.Http.Headers;
+using System.Reflection.Metadata.Ecma335;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -278,33 +280,192 @@ class Game
             }
         }
     }
-    private void Battle()
-    {
-        GenerateEnemies();
-        bool run = true;
-        while (run)
-        {
-            Console.Clear();
-            Console.Write("\x1b[3J");
-            _interface.BattleUI(_playerTeam, _enemyTeam);
-            char key = char.ToLower(Console.ReadKey(true).KeyChar);
 
-            switch(key)
+    private bool AskTurnOrder()
+    {
+        Console.WriteLine("Choose the turn Order: [S] Static [D] Dynamic");
+        char key = char.ToLower(Console.ReadKey(true).KeyChar);
+        while (true)
+        {
+            switch (key)
             {
-                case 'e':
-                    _enemyTeam.Clear();
-                    run = false;
-                    break;
-                case 'r':
-                    _enemyTeam.Clear();
-                    GenerateEnemies();
-                    break;
+                case 's':
+                    return true;
+                case 'd':
+                    return false;
+                default:
+                    continue;
             }
         }
     }
+    private void Battle()
+    {
+        bool turnOrderStatic = AskTurnOrder();
+        _enemyTeam.Clear();
+        GenerateEnemies();
+
+        if (turnOrderStatic)
+        {
+            Queue<Character> turnOrder = CreateQueue();
+            bool run = true;
+            // turns
+            while (run)
+            {
+                for (int i = 0; i < turnOrder.Count; i++)
+                {
+                    Console.Clear();
+                    Console.Write("\x1b[3J");
+
+                    Character current = turnOrder.Peek();
+                    _interface.BattleUI(_playerTeam, _enemyTeam, turnOrder, current);
+
+                    if (current is Enemy)
+                    {
+                        if (current.IsAlive)
+                        {
+                            //Choose action
+                            //Choose target
+                            //Attack
+                        }
+                    }
+                    else if (current is Player player)
+                    {
+                        if (player.IsAlive)
+                        {
+                            if (player.IsDown)
+                            {
+                                player.RollDeathSave();
+                            }
+                            else
+                            {
+                                _interface.ShowCharacterAttacks(player, turnOrderStatic);
+                            }
+                        retry1:
+                            char attackInput = char.ToLower(Console.ReadKey(true).KeyChar);
+
+                            int attackIndex;
+                            if (TryGetIndex(attackInput, player.Attacks.Count, out attackIndex))
+                            {
+                                Console.WriteLine($"Choose a target: [T] Teammate [E] Enemy");
+
+                            retry2:
+                                char targetInput = char.ToLower(Console.ReadKey(true).KeyChar);
+                                int targetIndex;
+                                switch (targetInput)
+                                {
+                                    case 't':
+                                        _interface.ShowTargets(_playerTeam);
+
+                                    retry3:
+                                        char targetIndexIn = char.ToLower(Console.ReadKey(true).KeyChar);
+                                        if (TryGetIndex(targetIndexIn, _playerTeam.Count, out targetIndex))
+                                        {
+                                            Character target = FindTargetInList(_playerTeam, targetIndex);
+
+                                            bool hit() => current.RollToHit(current.Attacks[attackIndex]) > target.ArmorClass;
+                                            if (hit())
+                                            {
+                                                target.TakeDamage(current.RollDamage(current.Attacks[attackIndex]), current.Attacks[attackIndex].DamageType);
+                                            }
+                                            else Console.WriteLine("Attack missed");
+                                        }
+                                        else goto retry3;
+
+                                        break;
+                                    case 'e':
+                                        _interface.ShowTargets(_enemyTeam);
+                                        break;
+                                    default:
+                                        goto retry2;
+                                }
+                            }
+                            else goto retry1;
+                        }
+                    }
+
+                    Console.ReadKey();
+
+                    //Character goes to the back of the queue
+                    turnOrder.Dequeue();
+                    turnOrder.Enqueue(current);
+                }
+                char key = char.ToLower(Console.ReadKey(true).KeyChar);
+                switch (key)
+                {
+                    case 'e':
+                        _enemyTeam.Clear();
+                        run = false;
+                        break;
+                }
+            }
+
+        }
+        else if (!turnOrderStatic)
+        {
+
+        }
+
+        //bool run = true;
+        //while (run)
+        //{
+        //    
+        //    
+        //    
+
+        //    
+        //    
+        //    
+        //    
+        //    
+        //    
+        //    
+        //    
+        //    
+        //    
+        //    
+        //}
+    }
+
+    private T FindTargetInList<T>(LinkedList<T> targets, int targetIndex) where T : Character
+    {
+        T target = targets.First();
+        int i = 1;
+        foreach (T t in targets)
+        {
+            if (i < targetIndex) break;
+            target = t;
+            i++;
+        }
+        return target;
+    }
+    private Queue<Character> CreateQueue()
+    {
+        List<Character> list = new List<Character>();
+        Queue<Character> queue = new Queue<Character>();
+
+        foreach (Character character in _playerTeam)
+        {
+            character.RollForInitiative();
+            list.Add(character);
+        }
+        foreach (Character character in _enemyTeam)
+        {
+            character.RollForInitiative();
+            list.Add(character);
+        }
+
+        list.Sort((a, b) => a.Initiative.CompareTo(b.Initiative));
+
+        foreach (Character character in list)
+        {
+            queue.Enqueue(character);
+        }
+        return queue;
+
+    }
     private void GenerateEnemies()
     {
-        if(Random.Shared.Next(1, 101) == 67)
+        if (Random.Shared.Next(1, 101) == 67)
         {
             Attack Scythe = new Attack("Scythe", 3, 3, DamageType.Slashing, new DiceRoll(1, 12));
             Attack Shitarmagedon = new Attack("Shitarmagedon", 3, 3, DamageType.Acid, new DiceRoll(10, 10));
@@ -317,14 +478,15 @@ class Game
             _enemyTeam.AddLast(Boss);
             return;
         }
-        
-        int count = Random.Shared.Next(1, 3*_playerTeam.Count+1);
+
+        int count = Random.Shared.Next(1, 3 * _playerTeam.Count + 1);
         for (int i = 0; i < count; i++)
         {
             int index = Random.Shared.Next(0, _availableEnemies.Count);
             _enemyTeam.AddLast(_availableEnemies[index].Clone());
         }
     }
+
     public void Run()
     {
         CharacterSelection();

@@ -17,7 +17,7 @@ class Player : Character
     {
         return new Player(Name, MaxHp, ArmorClass, InitiativeModifier, new List<Attack>(Attacks), new List<Resistance>(Resistances));
     }
-    public void RollDeathSave()
+    public int RollDeathSave()
     {
         int roll = Random.Shared.Next(1, 21);
         if (roll == 20)
@@ -34,6 +34,7 @@ class Player : Character
             Heal(1);
             DeathSaveSuccesses = DeathSaveFailures = 0;
         }
+        return roll;
     }
 }
 

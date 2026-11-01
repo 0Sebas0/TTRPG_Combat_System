@@ -257,45 +257,49 @@ class UI
         Console.Write($"] {c.CurrentHp,3}/{c.MaxHp}");
         Console.WriteLine();
     }
-    public void ShowAliveCharacters<T>(LinkedList<T> team) where T : Character
+    public void ShowCharacters<T>(LinkedList<T> team) where T : Character
     {
         foreach (T c in team)
         {
-            if (c.IsAlive)
+            if (!c.IsDown)
             {
-                if (!c.IsDown)
-                {
-                    Console.Write($"{c.Name,-12}[");
-                    ShowHealthBar(c, c.MaxHp);
-                }
-                else if (c.IsDown && c is Player)
-                {
-                    Console.Write($"(Unconscious) {c.Name,-20}[");
-                    ShowHealthBar(c, c.MaxHp);
-                }
-
-                Console.WriteLine();
+                Console.Write($"{c.Name,-12}[");
+                ShowHealthBar(c, c.MaxHp);
             }
+            else if (c.IsDown)
+            {
+                Console.Write($"(Unconscious) {c.Name,-20}[");
+                ShowHealthBar(c, c.MaxHp);
+            }
+            else if (!c.IsAlive)
+            {
+                Console.Write($"(Dead) {c.Name,-20}[");
+                ShowHealthBar(c, c.MaxHp);
+            }
+
+            Console.WriteLine();
+
         }
     }
     public void BattleUI(LinkedList<Player> playerTeam, LinkedList<Enemy> enemyTeam, Queue<Character> turnOrder, Character current)
     {
         Console.WriteLine("--------------------------- BATTLE ---------------------------");
         Console.WriteLine();
-        ShowAliveCharacters(enemyTeam);
+        ShowCharacters(enemyTeam);
         Console.WriteLine();
         Console.WriteLine();
-        ShowAliveCharacters(playerTeam);
+        ShowCharacters(playerTeam);
         Console.WriteLine();
         Console.WriteLine("--------------------------------------------------------------");
         ShowTurnOrder(turnOrder);
         Console.WriteLine();
-        Console.WriteLine($"Its {current.Name}'s turn.");
+        if(current.IsAlive)Console.WriteLine($"Its {current.Name}'s turn.");
+        Console.WriteLine();
     }
     public void ShowTurnOrder(Queue<Character> turnOrder)
     {
         Console.Write("Turn Order: ");
-        foreach(Character character in turnOrder)
+        foreach (Character character in turnOrder)
         {
             Console.Write($"[{character.Name}] ");
         }
@@ -312,7 +316,7 @@ class UI
             Console.Write($"{attack.BonusToHit} ");
             Console.Write($"{attack.Damage.Count}d{attack.Damage.Sides}");
             if (attack.DamageBonus > 0) Console.Write("+");
-            if (attack.DamageBonus != 0) Console.Write($"{attack.DamageBonus}"); 
+            if (attack.DamageBonus != 0) Console.Write($"{attack.DamageBonus}");
             Console.Write($" {attack.DamageType}");
             if (staticTurnOrder && (attack.DamageType == DamageType.Slow || attack.DamageType == DamageType.Haste)) Console.WriteLine("(no effect)");
             else Console.WriteLine();

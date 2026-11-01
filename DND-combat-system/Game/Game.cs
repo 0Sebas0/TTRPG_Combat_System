@@ -311,8 +311,9 @@ class Game
 
         if (turnOrderStatic)
         {
-            Queue<Character> turnOrder = CreateQueue();
             bool run = true;
+            RollForInitiative();
+            Queue<Character> turnOrder = CreateQueue();
             // turns
             while (run)
             {
@@ -343,8 +344,11 @@ class Game
                         {
                             if (player.IsDown)
                             {
-                                player.RollDeathSave();
+                                int roll = player.RollDeathSave();
                                 Console.WriteLine($"{player.Name} is down and rolls a death save.");
+                                Thread.Sleep(1800);
+                                Console.WriteLine($"{player.Name} rolled a {roll}.");
+                                Thread.Sleep(2000);
                             }
                             else
                             {
@@ -362,22 +366,21 @@ class Game
                             }
                         }
                     }
-
                     Console.ReadKey();
 
                     //Character goes to the back of the queue
                     turnOrder.Dequeue();
-                    turnOrder.Enqueue(current);
-                }
-                char key = char.ToLower(Console.ReadKey(true).KeyChar);
-                switch (key)
-                {
-                    case 'e':
-                        _enemyTeam.Clear();
-                        run = false;
-                        break;
+
+                    if (turnOrder.Count == 0)
+                    {
+                        //Clean up
+                        CleanUpTheDead<Enemy>(_enemyTeam);
+                        turnOrder = CreateQueue();
+                    }
                 }
             }
+            _enemyTeam.Clear();
+            _playerTeam.Clear();
 
         }
         else if (!turnOrderStatic)
@@ -392,12 +395,10 @@ class Game
 
         foreach (Character character in _playerTeam)
         {
-            character.RollForInitiative();
             list.Add(character);
         }
         foreach (Character character in _enemyTeam)
         {
-            character.RollForInitiative();
             list.Add(character);
         }
 
@@ -405,10 +406,22 @@ class Game
 
         foreach (Character character in list)
         {
-            queue.Enqueue(character);
+            if (character.IsAlive)
+                queue.Enqueue(character);
         }
         return queue;
 
+    }
+    private void RollForInitiative()
+    {
+        foreach (Player character in _playerTeam)
+        {
+            character.RollForInitiative();
+        }
+        foreach (Enemy character in _enemyTeam)
+        {
+            character.RollForInitiative();
+        }
     }
     private void GenerateEnemies()
     {
@@ -510,16 +523,38 @@ class Game
         }
 
         int roll = attacker.RollToHit(attack);
+        Console.WriteLine($"{attacker.Name} attacks {target.Name} with {attack.Name}");
+        Thread.Sleep(1800);
+        if (attacker is Player)
+        {
+            Console.WriteLine($"Rolled {roll}.");
+            Thread.Sleep(1800);
+        }
+
         if (roll >= target.ArmorClass)
         {
-            int hpBefore = target.CurrentHp;
-            target.TakeDamage(attacker.RollDamage(attack), attack.DamageType);
-            int dealt = hpBefore - target.CurrentHp;
-            Console.WriteLine($"{attacker.Name} hits {target.Name} with {attack.Name} (rolled {roll}) for {dealt} {attack.DamageType} damage.");
+            int damage = attacker.RollDamage(attack);
+            target.TakeDamage(damage, attack.DamageType);
+            Console.WriteLine("Attack hits");
+            Thread.Sleep(1800);
+            Console.WriteLine($"{target.Name} takes {damage} {attack.DamageType} damage");
+
         }
         else
         {
-            Console.WriteLine($"{attacker.Name} misses {target.Name} with {attack.Name} (rolled {roll}).");
+            Console.WriteLine("Attack missess");
+        }
+        Thread.Sleep(2000);
+    }
+
+    private void CleanUpTheDead<T>(LinkedList<T> team) where T : Character
+    {
+        foreach (T character in team)
+        {
+            if (!character.IsAlive)
+            {
+                team.Remove(character);
+            }
         }
     }
 

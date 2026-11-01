@@ -1,18 +1,21 @@
 ﻿namespace RpgBattle;
+
 using System.Text.Json.Serialization;
 
-class Character
+abstract class Character
 {
     public string Name { get; }
     public int MaxHp { get; }
-    [JsonIgnore] public int CurrentHp { get; private set; }
+    [JsonIgnore] public int CurrentHp { get; protected set; }
     public int ArmorClass { get; }
     public List<Attack> Attacks { get; }
     public List<Resistance> Resistances { get; }
-    [JsonIgnore] public LinkedList<StatusEffect> StatusEffects { get; private set; }
-    [JsonIgnore] public int Initiative { get; private set; }
+    [JsonIgnore] public LinkedList<StatusEffect> StatusEffects { get; protected set; }
+    [JsonIgnore] public int Initiative { get; protected set; }
     public int InitiativeModifier { get; }
-    [JsonIgnore] public bool IsAlive => CurrentHp > 0;
+    [JsonIgnore] public bool IsDown => CurrentHp <= 0;
+    [JsonIgnore] public virtual bool IsAlive => CurrentHp > 0;
+
 
     [JsonConstructor]
     public Character(string name, int maxHp, int armorClass, int initiativeModifier, List<Attack> attacks, List<Resistance> resistances)
@@ -27,10 +30,8 @@ class Character
         InitiativeModifier = initiativeModifier;
         StatusEffects = new LinkedList<StatusEffect>();
     }
-    public Character Clone()
-    {
-        return new Character(Name, MaxHp, ArmorClass, InitiativeModifier, new List<Attack>(Attacks), new List<Resistance>(Resistances));
-    }
+
+    public abstract Character Clone();
     public void TakeDamage(int amount, DamageType type)
     {
         if (amount < 0) return;
@@ -65,9 +66,19 @@ class Character
         if (amount < 0) return;
         CurrentHp = Math.Min(MaxHp, CurrentHp + amount);
     }
-    public int RollForAttack(Attack attack)
+    public int RollToHit(Attack attack)
     {
         return Random.Shared.Next(1, 21) + attack.BonusToHit;
+    }
+    public int RollDamage(Attack attack)
+    {
+        int damage = 0;
+        for(int i = 0; i< attack.Damage.Count;i++)
+        {
+            damage += Random.Shared.Next(1, attack.Damage.Sides + 1);
+        }
+        damage += attack.DamageBonus;
+        return damage;
     }
     public void RollForInitiative()
     {

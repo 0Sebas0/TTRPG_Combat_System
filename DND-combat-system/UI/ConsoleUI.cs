@@ -2,7 +2,7 @@
 
 class UI
 {
-    public void CharacterSelectionUI(List<Character> availableCharacters, LinkedList<Character> playerTeam, int page, int pageSize)
+    public void CharacterSelectionUI(List<Player> availableCharacters, LinkedList<Player> playerTeam, int page, int pageSize)
     {
         Console.WriteLine("-------------------- SELECT YOUR FIGHTERS --------------------");
         ShowAvailableCharacters(availableCharacters, playerTeam, page, pageSize);
@@ -15,7 +15,7 @@ class UI
         Console.WriteLine();
 
     }
-    public void ShowAvailableCharacters(List<Character> availableCharacters, LinkedList<Character> playerTeam, int page, int pageSize)
+    public void ShowAvailableCharacters(List<Player> availableCharacters, LinkedList<Player> playerTeam, int page, int pageSize)
     {
         int start = page * pageSize;
         int end = Math.Min(start + pageSize, availableCharacters.Count);
@@ -23,7 +23,7 @@ class UI
         for (int i = start; i < end; i++)
         {
             bool selected = false;
-            foreach (Character character2 in playerTeam)
+            foreach (Player character2 in playerTeam)
             {
                 if (character2.Name == availableCharacters[i].Name)
                 {
@@ -41,7 +41,7 @@ class UI
                 Console.WriteLine($"{num}. {availableCharacters[i].Name}");
             }
         }
-        for(int i = 0; i<pageSize-num; i++)
+        for (int i = 0; i < pageSize - num; i++)
         {
             Console.WriteLine();
         }
@@ -49,21 +49,21 @@ class UI
         Console.WriteLine();
         Console.WriteLine($"Page {page + 1}/{pageCount}");
     }
-    public void ShowChosencharacters(LinkedList<Character> playerTeam)
+    public void ShowChosencharacters(LinkedList<Player> playerTeam)
     {
         Console.Write("Your team: ");
-        foreach (Character character in playerTeam)
+        foreach (Player character in playerTeam)
         {
             Console.Write($"[{character.Name}] ");
         }
         Console.WriteLine();
     }
-    public void ShowCharacterSelectionControls(List<Character> availableCharacters, int page, int pageSize)
+    public void ShowCharacterSelectionControls(List<Player> availableCharacters, int page, int pageSize)
     {
         int onPage = Math.Min(pageSize, availableCharacters.Count - page * pageSize);
-        Console.WriteLine($"[1-{onPage}] Pick  [<-/->] Page  [I] Inspect  [D] Remove last  [C] Create  [N] Next");
+        Console.WriteLine($"[1-{onPage}] Pick  [<-/->] Page  [I] Inspect  [D] Remove last  [C] Create [P] Play [E] Exit");
     }
-    public void ShowCharacterStats(Character c)
+    public void ShowCharacterStats(Player c)
     {
         Console.WriteLine("--------------------------------------------------------------");
         Console.WriteLine();
@@ -136,7 +136,7 @@ class UI
         DamageType[] all = Enum.GetValues<DamageType>();
 
         const int columns = 3;
-        int rows = (int)Math.Ceiling(all.Length / (double)columns); // 13 / 3 -> 5 rows
+        int rows = (int)Math.Ceiling(all.Length / (double)columns);
 
         Console.WriteLine("Choose a damage type:");
 
@@ -233,6 +233,103 @@ class UI
         int choice = AskInt("Choose", 1, 3);
         return (ResistanceLevel)(choice - 1); // enum values start at 0: Resistance=0, Vulnerability=1, Immunity=2
     }
+    public void ShowHealthBar<T>(T c, int width) where T : Character
+    {
+        double ratio = (double)c.CurrentHp / c.MaxHp;
+        int filled = (int)Math.Round(ratio * width);
 
+        // Never show an empty bar for a living character (e.g. 1 HP of 100)
+        if (c.IsAlive && filled == 0) filled = 1;
+
+        // Pick a color based on how healthy the character is
+        ConsoleColor color;
+        if (!c.IsAlive) color = ConsoleColor.DarkGray;
+        else if (ratio > 0.5) color = ConsoleColor.Green;
+        else if (ratio > 0.25) color = ConsoleColor.Yellow;
+        else color = ConsoleColor.Red;
+
+        Console.ForegroundColor = color;
+        Console.Write(new string('█', filled));          // full part
+        Console.ForegroundColor = ConsoleColor.DarkGray;
+        Console.Write(new string('░', width - filled));  // empty part
+        Console.ResetColor();
+
+        Console.Write($"] {c.CurrentHp,3}/{c.MaxHp}");
+        Console.WriteLine();
+    }
+    public void ShowCharacters<T>(LinkedList<T> team) where T : Character
+    {
+        foreach (T c in team)
+        {
+            if (!c.IsDown)
+            {
+                Console.Write($"{c.Name,-12}[");
+                ShowHealthBar(c, c.MaxHp);
+            }
+            else if (!c.IsAlive)
+            {
+                Console.Write($"(Dead) {c.Name,-12}[");
+                ShowHealthBar(c, c.MaxHp);
+            }
+            else if (c.IsDown)
+            {
+                Console.Write($"(Unconscious) {c.Name,-12}[");
+                ShowHealthBar(c, c.MaxHp);
+            }
+
+            Console.WriteLine();
+
+        }
+    }
+    public void BattleUI(LinkedList<Player> playerTeam, LinkedList<Enemy> enemyTeam, Queue<Character> turnOrder, Character current)
+    {
+        Console.WriteLine("--------------------------- BATTLE ---------------------------");
+        Console.WriteLine();
+        ShowCharacters(enemyTeam);
+        Console.WriteLine();
+        Console.WriteLine();
+        ShowCharacters(playerTeam);
+        Console.WriteLine();
+        Console.WriteLine("--------------------------------------------------------------");
+        ShowTurnOrder(turnOrder);
+        Console.WriteLine();
+        if(current.IsAlive)Console.WriteLine($"Its {current.Name}'s turn.");
+        Console.WriteLine();
+    }
+    public void ShowTurnOrder(Queue<Character> turnOrder)
+    {
+        Console.Write("Turn Order: ");
+        foreach (Character character in turnOrder)
+        {
+            Console.Write($"[{character.Name}] ");
+        }
+        Console.WriteLine();
+    }
+    public void ShowCharacterAttacks(Character character, bool staticTurnOrder)
+    {
+        int number = 1;
+
+        foreach (Attack attack in character.Attacks)
+        {
+            Console.Write($"[{number}] {attack.Name} ATK");
+            if (attack.BonusToHit >= 0) Console.Write('+');
+            Console.Write($"{attack.BonusToHit} ");
+            Console.Write($"{attack.Damage.Count}d{attack.Damage.Sides}");
+            if (attack.DamageBonus > 0) Console.Write("+");
+            if (attack.DamageBonus != 0) Console.Write($"{attack.DamageBonus}");
+            Console.Write($" {attack.DamageType}");
+            if (staticTurnOrder && (attack.DamageType == DamageType.Slow || attack.DamageType == DamageType.Haste)) Console.WriteLine("(no effect)");
+            else Console.WriteLine();
+
+            number++;
+        }
+    }
+    public void ShowTargets(List<Character> targets)
+    {
+        for (int i = 0; i < targets.Count; i++)
+        {
+            Console.WriteLine($"[{i + 1}] {targets[i].Name}  HP {targets[i].CurrentHp}/{targets[i].MaxHp}");
+        }
+    }
 
 }

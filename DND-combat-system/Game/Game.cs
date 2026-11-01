@@ -1,13 +1,16 @@
 ﻿namespace RpgBattle;
+
+using System.Net.Http.Headers;
+using System.Reflection.Metadata.Ecma335;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 class Game
 {
-    private List<Character> _availableCharacters = new();
-    private List<Character> _availableEnemies = new();
-    private LinkedList<Character> _playerTeam = new();
-    private LinkedList<Character> _enemyTeam = new();
+    private List<Player> _availableCharacters = new();
+    private List<Enemy> _availableEnemies = new();
+    private LinkedList<Player> _playerTeam = new();
+    private LinkedList<Enemy> _enemyTeam = new();
     private UI _interface = new UI();
     private int _page = 0;
     private const int PageSize = 9;
@@ -27,30 +30,30 @@ class Game
 
     private void ReadJson()
     {
-        _availableCharacters = LoadFromFile("characters.json");
-        _availableEnemies = LoadFromFile("enemies.json");
+        _availableCharacters = LoadFromFile<Player>("characters.json");
+        _availableEnemies = LoadFromFile<Enemy>("enemies.json");
     }
-    private List<Character> LoadFromFile(string path)
+    private List<T> LoadFromFile<T>(string path) where T : Character
     {
         if (!File.Exists(path))
         {
             Console.WriteLine($"File not found: {path}");
-            return new List<Character>();
+            return new List<T>();
         }
 
         try
         {
             string json = File.ReadAllText(path);
-            return JsonSerializer.Deserialize<List<Character>>(json, _jsonOptions)
-                   ?? new List<Character>();
+            return JsonSerializer.Deserialize<List<T>>(json, _jsonOptions)
+                   ?? new List<T>();
         }
         catch (JsonException ex)
         {
             Console.WriteLine($"Bad JSON in {path}: {ex.Message}");
-            return new List<Character>();
+            return new List<T>();
         }
     }
-    private void SaveToFile(string path, List<Character> characters)
+    private void SaveToFile(string path, List<Player> characters)
     {
         try
         {
@@ -78,7 +81,7 @@ class Game
 
         if (keyChar < '1' || keyChar > '9') return false;
 
-        index = _page * PageSize + (keyChar-'1');
+        index = _page * PageSize + (keyChar - '1');
         return index < listSize;
     }
     private bool IsSelected(Character character)
@@ -89,7 +92,12 @@ class Game
         }
         return false;
     }
-    private void InspectCharacter(List<Character> availableCharacters)
+    private bool TryGetChoice(char key, int count, out int index)
+    {
+        index = key - '1';                       // '1' -> 0, '2' -> 1, ...
+        return key >= '1' && key <= '9' && index < count;
+    }
+    private void InspectCharacter(List<Player> availableCharacters)
     {
         int onPage = Math.Min(PageSize, availableCharacters.Count - _page * PageSize);
         Console.WriteLine($"Which character you want to inspect? [1-{onPage}]");
@@ -101,7 +109,7 @@ class Game
         }
 
     }
-    private Character? CreateCustomCharacter()
+    private Player? CreateCustomCharacter()
     {
         while (true) // repeats only if the player chooses "Redo"
         {
@@ -117,7 +125,7 @@ class Game
             List<Attack> attacks = AskAttacks();
             List<Resistance> resistances = AskResistances();
 
-            Character character = new Character(name, hp, ac, initiativeMod, attacks, resistances);
+            Player character = new Player(name, hp, ac, initiativeMod, attacks, resistances);
 
             _interface.ShowCharacterStats(character); // shows a summary and waits for a key
 
@@ -230,20 +238,20 @@ class Game
 
             var key = Console.ReadKey(true);
 
-            if(key.Key == ConsoleKey.RightArrow)
+            if (key.Key == ConsoleKey.RightArrow)
             {
-                if (_page < PageCount()-1) _page++;
+                if (_page < PageCount() - 1) _page++;
                 continue;
             }
-            if(key.Key == ConsoleKey.LeftArrow)
+            if (key.Key == ConsoleKey.LeftArrow)
             {
-                if(_page > 0) _page--;
+                if (_page > 0) _page--;
                 continue;
             }
 
             int index;
 
-            if (TryGetIndex(key.KeyChar, _availableCharacters.Count(), out index) && !IsSelected(_availableCharacters[index]))
+            if (TryGetIndex(key.KeyChar, _availableCharacters.Count, out index) && !IsSelected(_availableCharacters[index]))
             {
                 _playerTeam.AddLast(_availableCharacters[index].Clone());
             }
@@ -259,7 +267,7 @@ class Game
                     InspectCharacter(_availableCharacters);
                     break;
                 case 'c':
-                    Character? created = CreateCustomCharacter();
+                    Player? created = CreateCustomCharacter();
                     if (created != null)
                     {
                         _availableCharacters.Add(created);
@@ -268,12 +276,327 @@ class Game
                         _page = PageCount() - 1;
                     }
                     break;
-                case 'n':
-                    if (_playerTeam.Count > 0) run = false;
+                case 'p':
+                    if (_playerTeam.Count > 0) Battle();
+                    break;
+                case 'e':
+                    run = false;
                     break;
             }
         }
     }
+
+    private bool AskTurnOrder()
+    {
+        Console.WriteLine("Choose the turn Order: [S] Static [D] Dynamic");
+        char key = char.ToLower(Console.ReadKey(true).KeyChar);
+        while (true)
+        {
+            switch (key)
+            {
+                case 's':
+                    return true;
+                case 'd':
+                    return false;
+                default:
+                    continue;
+            }
+        }
+    }
+    private void Battle()
+    {
+        bool turnOrderStatic = AskTurnOrder();
+        _enemyTeam.Clear();
+        GenerateEnemies();
+
+        if (turnOrderStatic)
+        {
+            RollForInitiative();
+            Queue<Character> turnOrder = CreateQueue();
+            // turns
+            while (CheckWinCondition() == 0)
+            {
+                for (int i = 0; i < turnOrder.Count; i++)
+                {
+                    if (CheckWinCondition() != 0) break;
+                    Console.Clear();
+                    Console.Write("\x1b[3J");
+
+                    Character current = turnOrder.Peek();
+                    _interface.BattleUI(_playerTeam, _enemyTeam, turnOrder, current);
+
+                    if (current is Enemy enemy)
+                    {
+                        if (enemy.IsAlive)
+                        {
+                            // TEMPORARY: random target, first attack. Real AI rules come later.
+                            List<Character> targets = GetTargets(true, false);
+                            if (targets.Count > 0)
+                            {
+                                Character target = targets[Random.Shared.Next(targets.Count)];
+                                PerformAttack(enemy, enemy.Attacks[0], target, turnOrderStatic);
+                            }
+                        }
+                    }
+                    else if (current is Player player)
+                    {
+                        if (player.IsAlive)
+                        {
+                            if (player.IsDown)
+                            {
+                                int roll = player.RollDeathSave();
+                                Console.WriteLine($"{player.Name} is down and rolls a death save.");
+                                Thread.Sleep(1800);
+                                Console.WriteLine($"{player.Name} rolled a {roll}.");
+                                Thread.Sleep(2000);
+                            }
+                            else
+                            {
+                                Character? target;
+                                Attack attack;
+                                do
+                                {
+                                    _interface.ShowCharacterAttacks(player, turnOrderStatic);
+                                    attack = AskAttack(player);
+                                    target = AskTarget(attack);   // null means "Back"
+                                }
+                                while (target == null);
+
+                                PerformAttack(player, attack, target, turnOrderStatic);
+                            }
+                        }
+                    }
+                    Console.ReadKey();
+
+                    turnOrder.Dequeue();
+
+                    if (turnOrder.Count == 0)
+                    {
+                        //Clean up
+                        CleanUpTheDead<Enemy>(_enemyTeam);
+                        turnOrder = CreateQueue();
+                    }
+                }
+            }
+            if(CheckWinCondition() == 1)
+            {
+                Console.Clear();
+                Console.Write("\x1b[3J");
+                _interface.BattleUI(_playerTeam, _enemyTeam, new Queue<Character>(), _playerTeam.First());
+                Console.WriteLine("------ You Won :D ------");
+                Console.WriteLine();
+                Console.WriteLine("Press any key to go back to main menu.");
+            }
+            else if(CheckWinCondition() == -1)
+            {
+                Console.Clear();
+                Console.Write("\x1b[3J");
+                _interface.BattleUI(_playerTeam, _enemyTeam, new Queue<Character>(), _enemyTeam.First());
+                Console.WriteLine("------ You Lost :( ------");
+                Console.WriteLine();
+                Console.WriteLine("Press any key to go back to main menu.");
+            }
+            Console.ReadKey();
+
+        }
+        else if (!turnOrderStatic)
+        {
+
+        }
+        _enemyTeam.Clear();
+        _playerTeam.Clear();
+    }
+    private Queue<Character> CreateQueue()
+    {
+        List<Character> list = new List<Character>();
+        Queue<Character> queue = new Queue<Character>();
+
+        foreach (Character character in _playerTeam)
+        {
+            list.Add(character);
+        }
+        foreach (Character character in _enemyTeam)
+        {
+            list.Add(character);
+        }
+
+        list.Sort((a, b) => b.Initiative.CompareTo(a.Initiative));
+
+        foreach (Character character in list)
+        {
+            if (character.IsAlive)
+                queue.Enqueue(character);
+        }
+        return queue;
+
+    }
+    private void RollForInitiative()
+    {
+        foreach (Player character in _playerTeam)
+        {
+            character.RollForInitiative();
+        }
+        foreach (Enemy character in _enemyTeam)
+        {
+            character.RollForInitiative();
+        }
+    }
+    private void GenerateEnemies()
+    {
+        if (Random.Shared.Next(1, 101) == 67)
+        {
+            Attack Scythe = new Attack("Scythe", 3, 3, DamageType.Slashing, new DiceRoll(1, 12));
+            Attack Shitarmagedon = new Attack("Shitarmagedon", 3, 3, DamageType.Acid, new DiceRoll(10, 10));
+            List<Attack> attacks = new List<Attack>();
+
+            attacks.Add(Shitarmagedon);
+            attacks.Add(Scythe);
+
+            Enemy Boss = new Enemy("SHIT DEMON", 98, 16, 5, attacks, new List<Resistance>());
+            _enemyTeam.AddLast(Boss);
+            return;
+        }
+
+        int count = Random.Shared.Next(1, 2 * _playerTeam.Count + 1);
+        for (int i = 0; i < count; i++)
+        {
+            int index = Random.Shared.Next(0, _availableEnemies.Count);
+            _enemyTeam.AddLast(_availableEnemies[index].Clone());
+        }
+    }
+    private List<Character> GetTargets(bool allies, bool forHealing)
+    {
+        List<Character> targets = new List<Character>();
+
+        if (allies)
+        {
+            foreach (Player p in _playerTeam)
+            {
+                if (!p.IsDown) targets.Add(p);
+            }
+        }
+        else
+        {
+            foreach (Enemy e in _enemyTeam)
+            {
+                if (!e.IsDown) targets.Add(e);
+            }
+        }
+        return targets;
+    }
+    private Attack AskAttack(Player player)
+    {
+        while (true)
+        {
+            char key = char.ToLower(Console.ReadKey(true).KeyChar);
+            if (TryGetChoice(key, player.Attacks.Count, out int index))
+                return player.Attacks[index];
+        }
+    }
+    private Character? AskTarget(Attack attack)
+    {
+        bool healing = attack.DamageType == DamageType.Heal;
+        Console.WriteLine("Choose a target: [T] Teammate  [E] Enemy  [B] Back");
+
+        while (true)
+        {
+            char key = char.ToLower(Console.ReadKey(true).KeyChar);
+
+            List<Character> targets;
+            if (key == 't') targets = GetTargets(true, healing);
+            else if (key == 'e') targets = GetTargets(false, healing);
+            else if (key == 'b') return null;
+            else continue;
+
+            if (targets.Count == 0)
+            {
+                Console.WriteLine("No valid targets there.");
+                continue;
+            }
+
+            _interface.ShowTargets(targets);
+
+            while (true)
+            {
+                char pick = char.ToLower(Console.ReadKey(true).KeyChar);
+                if (TryGetChoice(pick, targets.Count, out int index))
+                    return targets[index];
+            }
+        }
+    }
+    private void PerformAttack(Character attacker, Attack attack, Character target, bool turnOrderStatic)
+    {
+        if (attack.DamageType == DamageType.Heal)
+        {
+            int amount = attacker.RollDamage(attack);
+            target.Heal(amount);
+            Console.WriteLine($"{attacker.Name} uses {attack.Name} and heals {target.Name} for {amount} HP.");
+            return;
+        }
+
+        if ((attack.DamageType == DamageType.Slow || attack.DamageType == DamageType.Haste) && turnOrderStatic)
+        {
+            Console.WriteLine($"{attacker.Name} uses {attack.Name} on {target.Name}, but it has no effect yet.");
+            return;
+        }
+
+        int roll = attacker.RollToHit(attack);
+        Console.WriteLine($"{attacker.Name} attacks {target.Name} with {attack.Name}");
+        Thread.Sleep(1800);
+        if (attacker is Player)
+        {
+            Console.WriteLine($"Rolled {roll}.");
+            Thread.Sleep(1800);
+        }
+
+        if (roll >= target.ArmorClass)
+        {
+            int damage = attacker.RollDamage(attack);
+            target.TakeDamage(damage, attack.DamageType);
+            Console.WriteLine("Attack hits");
+            Thread.Sleep(1800);
+            Console.WriteLine($"{target.Name} takes {damage} {attack.DamageType} damage");
+
+        }
+        else
+        {
+            Console.WriteLine("Attack missess");
+        }
+        Thread.Sleep(2000);
+    }
+
+    private void CleanUpTheDead<T>(LinkedList<T> team) where T : Character
+    {
+        LinkedListNode<T>? node = team.First;
+
+        while (node != null)
+        {
+            LinkedListNode<T>? next = node.Next;
+
+            if (!node.Value.IsAlive)
+                team.Remove(node);
+
+            node = next;
+        }
+    }
+    private int CheckWinCondition()
+    {
+        bool allUnconscious = true;
+        foreach (Player player in _playerTeam)
+        {
+            if (!player.IsDown) allUnconscious = false;
+        }
+
+        // If all player characters are unconscious Player loses
+        if (allUnconscious) return -1;
+
+        // If all enemies are dead Player wins
+        if (_enemyTeam.Count == 0) return 1;
+
+        //else game continues
+        return 0;
+    }
+
     public void Run()
     {
         CharacterSelection();

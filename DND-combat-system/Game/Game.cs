@@ -311,14 +311,14 @@ class Game
 
         if (turnOrderStatic)
         {
-            bool run = true;
             RollForInitiative();
             Queue<Character> turnOrder = CreateQueue();
             // turns
-            while (run)
+            while (CheckWinCondition() == 0)
             {
                 for (int i = 0; i < turnOrder.Count; i++)
                 {
+                    if (CheckWinCondition() != 0) break;
                     Console.Clear();
                     Console.Write("\x1b[3J");
 
@@ -368,7 +368,6 @@ class Game
                     }
                     Console.ReadKey();
 
-                    //Character goes to the back of the queue
                     turnOrder.Dequeue();
 
                     if (turnOrder.Count == 0)
@@ -379,14 +378,33 @@ class Game
                     }
                 }
             }
-            _enemyTeam.Clear();
-            _playerTeam.Clear();
+            if(CheckWinCondition() == 1)
+            {
+                Console.Clear();
+                Console.Write("\x1b[3J");
+                _interface.BattleUI(_playerTeam, _enemyTeam, new Queue<Character>(), _playerTeam.First());
+                Console.WriteLine("------ You Won :D ------");
+                Console.WriteLine();
+                Console.WriteLine("Press any key to go back to main menu.");
+            }
+            else if(CheckWinCondition() == -1)
+            {
+                Console.Clear();
+                Console.Write("\x1b[3J");
+                _interface.BattleUI(_playerTeam, _enemyTeam, new Queue<Character>(), _enemyTeam.First());
+                Console.WriteLine("------ You Lost :( ------");
+                Console.WriteLine();
+                Console.WriteLine("Press any key to go back to main menu.");
+            }
+            Console.ReadKey();
 
         }
         else if (!turnOrderStatic)
         {
 
         }
+        _enemyTeam.Clear();
+        _playerTeam.Clear();
     }
     private Queue<Character> CreateQueue()
     {
@@ -439,7 +457,7 @@ class Game
             return;
         }
 
-        int count = Random.Shared.Next(1, 3 * _playerTeam.Count + 1);
+        int count = Random.Shared.Next(1, 2 * _playerTeam.Count + 1);
         for (int i = 0; i < count; i++)
         {
             int index = Random.Shared.Next(0, _availableEnemies.Count);
@@ -549,13 +567,34 @@ class Game
 
     private void CleanUpTheDead<T>(LinkedList<T> team) where T : Character
     {
-        foreach (T character in team)
+        LinkedListNode<T>? node = team.First;
+
+        while (node != null)
         {
-            if (!character.IsAlive)
-            {
-                team.Remove(character);
-            }
+            LinkedListNode<T>? next = node.Next;
+
+            if (!node.Value.IsAlive)
+                team.Remove(node);
+
+            node = next;
         }
+    }
+    private int CheckWinCondition()
+    {
+        bool allUnconscious = true;
+        foreach (Player player in _playerTeam)
+        {
+            if (!player.IsDown) allUnconscious = false;
+        }
+
+        // If all player characters are unconscious Player loses
+        if (allUnconscious) return -1;
+
+        // If all enemies are dead Player wins
+        if (_enemyTeam.Count == 0) return 1;
+
+        //else game continues
+        return 0;
     }
 
     public void Run()

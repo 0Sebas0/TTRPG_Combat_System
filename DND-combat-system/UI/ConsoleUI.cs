@@ -266,14 +266,14 @@ class UI
                 Console.Write($"{c.Name,-12}[");
                 ShowHealthBar(c, c.MaxHp);
             }
-            else if (c.IsDown)
-            {
-                Console.Write($"(Unconscious) {c.Name,-20}[");
-                ShowHealthBar(c, c.MaxHp);
-            }
             else if (!c.IsAlive)
             {
-                Console.Write($"(Dead) {c.Name,-20}[");
+                Console.Write($"(Dead) {c.Name,-12}[");
+                ShowHealthBar(c, c.MaxHp);
+            }
+            else if (c.IsDown)
+            {
+                Console.Write($"(Unconscious) {c.Name,-12}[");
                 ShowHealthBar(c, c.MaxHp);
             }
 

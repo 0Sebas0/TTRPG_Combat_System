@@ -318,9 +318,9 @@ class Game
             {
                 for (int i = 0; i < turnOrder.Count; i++)
                 {
-                    if (CheckWinCondition() != 0) break;
                     Console.Clear();
                     Console.Write("\x1b[3J");
+                    if (CheckWinCondition() != 0) break;
 
                     Character current = turnOrder.Peek();
                     _interface.BattleUI(_playerTeam, _enemyTeam, turnOrder, current);
@@ -378,7 +378,7 @@ class Game
                     }
                 }
             }
-            if(CheckWinCondition() == 1)
+            if (CheckWinCondition() == 1)
             {
                 Console.Clear();
                 Console.Write("\x1b[3J");
@@ -387,7 +387,7 @@ class Game
                 Console.WriteLine();
                 Console.WriteLine("Press any key to go back to main menu.");
             }
-            else if(CheckWinCondition() == -1)
+            else if (CheckWinCondition() == -1)
             {
                 Console.Clear();
                 Console.Write("\x1b[3J");
@@ -552,9 +552,15 @@ class Game
         if (roll >= target.ArmorClass)
         {
             int damage = attacker.RollDamage(attack);
-            target.TakeDamage(damage, attack.DamageType);
-            Console.WriteLine("Attack hits");
+            if (roll - attack.BonusToHit == 20)
+            {
+                damage = 2 * damage;
+                Console.WriteLine("Critical hit!");
+            }
+            else
+                Console.WriteLine("Attack hits");
             Thread.Sleep(1800);
+            target.TakeDamage(damage, attack.DamageType);
             Console.WriteLine($"{target.Name} takes {damage} {attack.DamageType} damage");
 
         }
@@ -591,7 +597,12 @@ class Game
         if (allUnconscious) return -1;
 
         // If all enemies are dead Player wins
-        if (_enemyTeam.Count == 0) return 1;
+        bool allDead = true;
+        foreach (Enemy enemy in _enemyTeam)
+        {
+            if (enemy.IsAlive) allDead = false;
+        }
+        if (allDead) return 1;
 
         //else game continues
         return 0;

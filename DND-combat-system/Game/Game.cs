@@ -366,7 +366,7 @@ class Game
                             }
                         }
                     }
-                    Console.ReadKey();
+                    //Console.ReadKey();
 
                     turnOrder.Dequeue();
 
@@ -560,8 +560,8 @@ class Game
             else
                 Console.WriteLine("Attack hits");
             Thread.Sleep(1800);
-            target.TakeDamage(damage, attack.DamageType);
-            Console.WriteLine($"{target.Name} takes {damage} {attack.DamageType} damage");
+            int dealt = target.TakeDamage(damage, attack.DamageType);
+            Console.WriteLine($"{target.Name} takes {dealt} {attack.DamageType} damage");
 
         }
         else

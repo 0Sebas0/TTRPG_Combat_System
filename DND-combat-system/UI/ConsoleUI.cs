@@ -255,7 +255,6 @@ class UI
         Console.ResetColor();
 
         Console.Write($"] {c.CurrentHp,3}/{c.MaxHp}");
-        Console.WriteLine();
     }
     public void ShowCharacters<T>(LinkedList<T> team) where T : Character
     {
@@ -271,12 +270,14 @@ class UI
                 Console.Write($"(Dead) {c.Name,-12}[");
                 ShowHealthBar(c, c.MaxHp);
             }
-            else if (c.IsDown)
+            else if (c.IsDown && c is Player player)
             {
-                Console.Write($"(Unconscious) {c.Name,-12}[");
-                ShowHealthBar(c, c.MaxHp);
+                Console.Write($"(Unconscious) {player.Name,-12}[");
+                ShowHealthBar(player, player.MaxHp);
+                Console.Write($" Successes: {player.DeathSaveSuccesses} Failures: {player.DeathSaveFailures}");
             }
 
+            Console.WriteLine();
             Console.WriteLine();
 
         }

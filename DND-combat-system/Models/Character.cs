@@ -32,9 +32,9 @@ abstract class Character
     }
 
     public abstract Character Clone();
-    public void TakeDamage(int amount, DamageType type)
+    public int TakeDamage(int amount, DamageType type)
     {
-        if (amount < 0) return;
+        if (amount < 0) return 0;
         int finalDamage = amount;
 
         foreach (Resistance resistance in Resistances)
@@ -60,6 +60,7 @@ abstract class Character
         }
 
         CurrentHp = Math.Max(0, CurrentHp - finalDamage);
+        return finalDamage;
     }
     public void Heal(int amount)
     {

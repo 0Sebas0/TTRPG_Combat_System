@@ -289,9 +289,9 @@ class Game
     private bool AskTurnOrder()
     {
         Console.WriteLine("Choose the turn Order: [S] Static [D] Dynamic");
-        char key = char.ToLower(Console.ReadKey(true).KeyChar);
         while (true)
         {
+            char key = char.ToLower(Console.ReadKey(true).KeyChar);
             switch (key)
             {
                 case 's':
@@ -305,7 +305,8 @@ class Game
     }
     private void Battle()
     {
-        bool turnOrderStatic = AskTurnOrder();
+        bool turnOrderStatic;
+        turnOrderStatic = AskTurnOrder();
         _enemyTeam.Clear();
         GenerateEnemies();
 

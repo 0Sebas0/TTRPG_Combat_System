@@ -1,36 +1,213 @@
 [
   {
-    "name": "Thorin",
-    "maxHp": 28,
-    "armorClass": 17,
+    "name": "Brunhild",
+    "maxHp": 31,
+    "armorClass": 16,
     "initiativeModifier": 1,
     "attacks": [
       {
-        "name": "Longsword",
+        "name": "Greatsword",
         "bonusToHit": 5,
-        "damageBonus": 2,
+        "damageBonus": 3,
         "damageType": "Slashing",
+        "damage": {
+          "count": 2,
+          "sides": 6
+        }
+      },
+      {
+        "name": "Handaxe",
+        "bonusToHit": 5,
+        "damageBonus": 3,
+        "damageType": "Slashing",
+        "damage": {
+          "count": 1,
+          "sides": 6
+        }
+      },
+      {
+        "name": "Light Crossbow",
+        "bonusToHit": 3,
+        "damageBonus": 1,
+        "damageType": "Piercing",
         "damage": {
           "count": 1,
           "sides": 8
         }
       }
     ],
-    "resistances": []
+    "resistances": [
+      {
+        "damageType": "Poison",
+        "resistanceLevel": "Resistance"
+      }
+    ]
   },
   {
-    "name": "Elara",
-    "maxHp": 16,
-    "armorClass": 12,
+    "name": "Kaelith",
+    "maxHp": 20,
+    "armorClass": 15,
     "initiativeModifier": 2,
     "attacks": [
       {
         "name": "Fire Bolt",
         "bonusToHit": 5,
+        "damageBonus": 0,
         "damageType": "Fire",
         "damage": {
           "count": 1,
           "sides": 10
+        }
+      },
+      {
+        "name": "Ray of Frost",
+        "bonusToHit": 5,
+        "damageBonus": 0,
+        "damageType": "Cold",
+        "damage": {
+          "count": 1,
+          "sides": 8
+        }
+      },
+      {
+        "name": "Shocking Grasp",
+        "bonusToHit": 5,
+        "damageBonus": 0,
+        "damageType": "Lightning",
+        "damage": {
+          "count": 1,
+          "sides": 8
+        }
+      },
+      {
+        "name": "Sluggish Hex",
+        "bonusToHit": 5,
+        "damageBonus": 0,
+        "damageType": "Slow",
+        "damage": {
+          "count": 1,
+          "sides": 4
+        }
+      }
+    ],
+    "resistances": [
+      {
+        "damageType": "Lightning",
+        "resistanceLevel": "Resistance"
+      }
+    ]
+  },
+  {
+    "name": "Pip",
+    "maxHp": 21,
+    "armorClass": 15,
+    "initiativeModifier": 3,
+    "attacks": [
+      {
+        "name": "Shortsword",
+        "bonusToHit": 5,
+        "damageBonus": 3,
+        "damageType": "Piercing",
+        "damage": {
+          "count": 1,
+          "sides": 6
+        }
+      },
+      {
+        "name": "Sneak Attack",
+        "bonusToHit": 3,
+        "damageBonus": 3,
+        "damageType": "Piercing",
+        "damage": {
+          "count": 3,
+          "sides": 6
+        }
+      }
+    ],
+    "resistances": []
+  },
+  {
+    "name": "Seraphine",
+    "maxHp": 24,
+    "armorClass": 18,
+    "initiativeModifier": 0,
+    "attacks": [
+      {
+        "name": "Mace",
+        "bonusToHit": 4,
+        "damageBonus": 2,
+        "damageType": "Bludgeoning",
+        "damage": {
+          "count": 1,
+          "sides": 6
+        }
+      },
+      {
+        "name": "Sacred Flame",
+        "bonusToHit": 5,
+        "damageBonus": 0,
+        "damageType": "Radiant",
+        "damage": {
+          "count": 1,
+          "sides": 8
+        }
+      },
+      {
+        "name": "Cure Wounds",
+        "bonusToHit": 0,
+        "damageBonus": 3,
+        "damageType": "Heal",
+        "damage": {
+          "count": 1,
+          "sides": 8
+        }
+      }
+    ],
+    "resistances": [
+      {
+        "damageType": "Necrotic",
+        "resistanceLevel": "Resistance"
+      },
+      {
+        "damageType": "Radiant",
+        "resistanceLevel": "Resistance"
+      }
+    ]
+  },
+  {
+    "name": "Lysander",
+    "maxHp": 21,
+    "armorClass": 13,
+    "initiativeModifier": 2,
+    "attacks": [
+      {
+        "name": "Rapier",
+        "bonusToHit": 4,
+        "damageBonus": 2,
+        "damageType": "Piercing",
+        "damage": {
+          "count": 1,
+          "sides": 8
+        }
+      },
+      {
+        "name": "Vicious Mockery",
+        "bonusToHit": 5,
+        "damageBonus": 0,
+        "damageType": "Psychic",
+        "damage": {
+          "count": 1,
+          "sides": 4
+        }
+      },
+      {
+        "name": "Song of Haste",
+        "bonusToHit": 0,
+        "damageBonus": 0,
+        "damageType": "Haste",
+        "damage": {
+          "count": 1,
+          "sides": 4
         }
       }
     ],
@@ -40,63 +217,5 @@
         "resistanceLevel": "Resistance"
       }
     ]
-  },
-  {
-    "name": "Pranas",
-    "maxHp": 8,
-    "armorClass": 11,
-    "initiativeModifier": 0,
-    "attacks": [
-      {
-        "name": "Dagger",
-        "bonusToHit": 2,
-        "damageBonus": 0,
-        "damageType": "Piercing",
-        "damage": {
-          "count": 1,
-          "sides": 4
-        }
-      },
-      {
-        "name": "Shortsword",
-        "bonusToHit": 2,
-        "damageBonus": 0,
-        "damageType": "Slashing",
-        "damage": {
-          "count": 1,
-          "sides": 6
-        }
-      }
-    ],
-    "resistances": []
-  },
-  {
-    "name": "Varliavaris",
-    "maxHp": 9,
-    "armorClass": 8,
-    "initiativeModifier": -2,
-    "attacks": [
-      {
-        "name": "Spear",
-        "bonusToHit": 2,
-        "damageBonus": 0,
-        "damageType": "Piercing",
-        "damage": {
-          "count": 1,
-          "sides": 6
-        }
-      },
-      {
-        "name": "Crossbow",
-        "bonusToHit": 0,
-        "damageBonus": -2,
-        "damageType": "Slashing",
-        "damage": {
-          "count": 1,
-          "sides": 8
-        }
-      }
-    ],
-    "resistances": []
   }
 ]

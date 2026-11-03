@@ -1,5 +1,101 @@
 [
   {
+    "name": "Giant Rat",
+    "maxHp": 7,
+    "armorClass": 12,
+    "initiativeModifier": 2,
+    "attacks": [
+      {
+        "name": "Bite",
+        "bonusToHit": 4,
+        "damageBonus": 2,
+        "damageType": "Piercing",
+        "damage": {
+          "count": 1,
+          "sides": 4
+        }
+      }
+    ],
+    "resistances": []
+  },
+  {
+    "name": "Kobold",
+    "maxHp": 5,
+    "armorClass": 12,
+    "initiativeModifier": 2,
+    "attacks": [
+      {
+        "name": "Dagger",
+        "bonusToHit": 4,
+        "damageBonus": 2,
+        "damageType": "Piercing",
+        "damage": {
+          "count": 1,
+          "sides": 4
+        }
+      },
+      {
+        "name": "Sling",
+        "bonusToHit": 4,
+        "damageBonus": 2,
+        "damageType": "Bludgeoning",
+        "damage": {
+          "count": 1,
+          "sides": 4
+        }
+      }
+    ],
+    "resistances": []
+  },
+  {
+    "name": "Cultist",
+    "maxHp": 9,
+    "armorClass": 12,
+    "initiativeModifier": 0,
+    "attacks": [
+      {
+        "name": "Scimitar",
+        "bonusToHit": 3,
+        "damageBonus": 1,
+        "damageType": "Slashing",
+        "damage": {
+          "count": 1,
+          "sides": 6
+        }
+      }
+    ],
+    "resistances": []
+  },
+  {
+    "name": "Bandit",
+    "maxHp": 11,
+    "armorClass": 12,
+    "initiativeModifier": 1,
+    "attacks": [
+      {
+        "name": "Scimitar",
+        "bonusToHit": 3,
+        "damageBonus": 1,
+        "damageType": "Slashing",
+        "damage": {
+          "count": 1,
+          "sides": 6
+        }
+      },
+      {
+        "name": "Light Crossbow",
+        "bonusToHit": 3,
+        "damageBonus": 1,
+        "damageType": "Piercing",
+        "damage": {
+          "count": 1,
+          "sides": 8
+        }
+      }
+    ],
+    "resistances": []
+  },
+  {
     "name": "Goblin",
     "maxHp": 7,
     "armorClass": 15,
@@ -62,14 +158,520 @@
           "count": 1,
           "sides": 6
         }
+      },
+      {
+        "name": "Shortbow",
+        "bonusToHit": 4,
+        "damageBonus": 2,
+        "damageType": "Piercing",
+        "damage": {
+          "count": 1,
+          "sides": 6
+        }
       }
-
     ],
     "resistances": [
       {
         "damageType": "Bludgeoning",
         "resistanceLevel": "Vulnerability"
+      },
+      {
+        "damageType": "Poison",
+        "resistanceLevel": "Immunity"
       }
     ]
+  },
+  {
+    "name": "Acolyte",
+    "maxHp": 9,
+    "armorClass": 10,
+    "initiativeModifier": 0,
+    "attacks": [
+      {
+        "name": "Club",
+        "bonusToHit": 2,
+        "damageBonus": 0,
+        "damageType": "Bludgeoning",
+        "damage": {
+          "count": 1,
+          "sides": 4
+        }
+      },
+      {
+        "name": "Sacred Flame",
+        "bonusToHit": 4,
+        "damageBonus": 0,
+        "damageType": "Radiant",
+        "damage": {
+          "count": 1,
+          "sides": 8
+        }
+      },
+      {
+        "name": "Cure Wounds",
+        "bonusToHit": 0,
+        "damageBonus": 2,
+        "damageType": "Heal",
+        "damage": {
+          "count": 1,
+          "sides": 8
+        }
+      }
+    ],
+    "resistances": []
+  },
+  {
+    "name": "Zombie",
+    "maxHp": 22,
+    "armorClass": 8,
+    "initiativeModifier": -2,
+    "attacks": [
+      {
+        "name": "Slam",
+        "bonusToHit": 3,
+        "damageBonus": 1,
+        "damageType": "Bludgeoning",
+        "damage": {
+          "count": 1,
+          "sides": 6
+        }
+      }
+    ],
+    "resistances": [
+      {
+        "damageType": "Poison",
+        "resistanceLevel": "Immunity"
+      }
+    ]
+  },
+  {
+    "name": "Wolf",
+    "maxHp": 11,
+    "armorClass": 13,
+    "initiativeModifier": 2,
+    "attacks": [
+      {
+        "name": "Bite",
+        "bonusToHit": 4,
+        "damageBonus": 2,
+        "damageType": "Piercing",
+        "damage": {
+          "count": 2,
+          "sides": 4
+        }
+      }
+    ],
+    "resistances": []
+  },
+  {
+    "name": "Giant Snake",
+    "maxHp": 11,
+    "armorClass": 14,
+    "initiativeModifier": 4,
+    "attacks": [
+      {
+        "name": "Bite",
+        "bonusToHit": 6,
+        "damageBonus": 0,
+        "damageType": "Piercing",
+        "damage": {
+          "count": 1,
+          "sides": 4
+        }
+      },
+      {
+        "name": "Venom Bite",
+        "bonusToHit": 6,
+        "damageBonus": 0,
+        "damageType": "Poison",
+        "damage": {
+          "count": 2,
+          "sides": 6
+        }
+      }
+    ],
+    "resistances": []
+  },
+  {
+    "name": "Hobgoblin",
+    "maxHp": 11,
+    "armorClass": 18,
+    "initiativeModifier": 1,
+    "attacks": [
+      {
+        "name": "Longsword",
+        "bonusToHit": 3,
+        "damageBonus": 1,
+        "damageType": "Slashing",
+        "damage": {
+          "count": 1,
+          "sides": 8
+        }
+      },
+      {
+        "name": "Longbow",
+        "bonusToHit": 3,
+        "damageBonus": 1,
+        "damageType": "Piercing",
+        "damage": {
+          "count": 1,
+          "sides": 8
+        }
+      },
+      {
+        "name": "Rally Cry",
+        "bonusToHit": 0,
+        "damageBonus": 0,
+        "damageType": "Haste",
+        "damage": {
+          "count": 1,
+          "sides": 4
+        }
+      }
+    ],
+    "resistances": []
+  },
+  {
+    "name": "Orc",
+    "maxHp": 15,
+    "armorClass": 13,
+    "initiativeModifier": 1,
+    "attacks": [
+      {
+        "name": "Greataxe",
+        "bonusToHit": 5,
+        "damageBonus": 3,
+        "damageType": "Slashing",
+        "damage": {
+          "count": 1,
+          "sides": 12
+        }
+      },
+      {
+        "name": "Javelin",
+        "bonusToHit": 5,
+        "damageBonus": 3,
+        "damageType": "Piercing",
+        "damage": {
+          "count": 1,
+          "sides": 6
+        }
+      }
+    ],
+    "resistances": []
+  },
+  {
+    "name": "Magmin",
+    "maxHp": 9,
+    "armorClass": 14,
+    "initiativeModifier": 2,
+    "attacks": [
+      {
+        "name": "Fiery Touch",
+        "bonusToHit": 4,
+        "damageBonus": 0,
+        "damageType": "Fire",
+        "damage": {
+          "count": 2,
+          "sides": 6
+        }
+      }
+    ],
+    "resistances": [
+      {
+        "damageType": "Fire",
+        "resistanceLevel": "Immunity"
+      }
+    ]
+  },
+  {
+    "name": "Ice Mephit",
+    "maxHp": 21,
+    "armorClass": 11,
+    "initiativeModifier": 1,
+    "attacks": [
+      {
+        "name": "Claws",
+        "bonusToHit": 3,
+        "damageBonus": 1,
+        "damageType": "Slashing",
+        "damage": {
+          "count": 1,
+          "sides": 4
+        }
+      },
+      {
+        "name": "Frost Breath",
+        "bonusToHit": 3,
+        "damageBonus": 0,
+        "damageType": "Cold",
+        "damage": {
+          "count": 2,
+          "sides": 4
+        }
+      }
+    ],
+    "resistances": [
+      {
+        "damageType": "Bludgeoning",
+        "resistanceLevel": "Vulnerability"
+      },
+      {
+        "damageType": "Fire",
+        "resistanceLevel": "Vulnerability"
+      },
+      {
+        "damageType": "Cold",
+        "resistanceLevel": "Immunity"
+      },
+      {
+        "damageType": "Poison",
+        "resistanceLevel": "Immunity"
+      }
+    ]
+  },
+  {
+    "name": "Shadow",
+    "maxHp": 16,
+    "armorClass": 12,
+    "initiativeModifier": 2,
+    "attacks": [
+      {
+        "name": "Strength Drain",
+        "bonusToHit": 4,
+        "damageBonus": 2,
+        "damageType": "Necrotic",
+        "damage": {
+          "count": 2,
+          "sides": 6
+        }
+      }
+    ],
+    "resistances": [
+      {
+        "damageType": "Radiant",
+        "resistanceLevel": "Vulnerability"
+      },
+      {
+        "damageType": "Acid",
+        "resistanceLevel": "Resistance"
+      },
+      {
+        "damageType": "Cold",
+        "resistanceLevel": "Resistance"
+      },
+      {
+        "damageType": "Fire",
+        "resistanceLevel": "Resistance"
+      },
+      {
+        "damageType": "Lightning",
+        "resistanceLevel": "Resistance"
+      },
+      {
+        "damageType": "Thunder",
+        "resistanceLevel": "Resistance"
+      },
+      {
+        "damageType": "Necrotic",
+        "resistanceLevel": "Immunity"
+      },
+      {
+        "damageType": "Poison",
+        "resistanceLevel": "Immunity"
+      }
+    ]
+  },
+  {
+    "name": "Ghoul",
+    "maxHp": 22,
+    "armorClass": 12,
+    "initiativeModifier": 2,
+    "attacks": [
+      {
+        "name": "Claws",
+        "bonusToHit": 4,
+        "damageBonus": 2,
+        "damageType": "Slashing",
+        "damage": {
+          "count": 2,
+          "sides": 4
+        }
+      },
+      {
+        "name": "Bite",
+        "bonusToHit": 2,
+        "damageBonus": 2,
+        "damageType": "Piercing",
+        "damage": {
+          "count": 2,
+          "sides": 6
+        }
+      }
+    ],
+    "resistances": [
+      {
+        "damageType": "Poison",
+        "resistanceLevel": "Immunity"
+      }
+    ]
+  },
+  {
+    "name": "Giant Spider",
+    "maxHp": 26,
+    "armorClass": 14,
+    "initiativeModifier": 3,
+    "attacks": [
+      {
+        "name": "Bite",
+        "bonusToHit": 5,
+        "damageBonus": 3,
+        "damageType": "Piercing",
+        "damage": {
+          "count": 1,
+          "sides": 8
+        }
+      },
+      {
+        "name": "Web Shot",
+        "bonusToHit": 5,
+        "damageBonus": 0,
+        "damageType": "Slow",
+        "damage": {
+          "count": 1,
+          "sides": 4
+        }
+      }
+    ],
+    "resistances": []
+  },
+  {
+    "name": "Brown Bear",
+    "maxHp": 34,
+    "armorClass": 11,
+    "initiativeModifier": 0,
+    "attacks": [
+      {
+        "name": "Claws",
+        "bonusToHit": 5,
+        "damageBonus": 4,
+        "damageType": "Slashing",
+        "damage": {
+          "count": 2,
+          "sides": 6
+        }
+      },
+      {
+        "name": "Bite",
+        "bonusToHit": 5,
+        "damageBonus": 4,
+        "damageType": "Piercing",
+        "damage": {
+          "count": 1,
+          "sides": 8
+        }
+      }
+    ],
+    "resistances": []
+  },
+  {
+    "name": "Bugbear",
+    "maxHp": 27,
+    "armorClass": 16,
+    "initiativeModifier": 2,
+    "attacks": [
+      {
+        "name": "Morningstar",
+        "bonusToHit": 4,
+        "damageBonus": 2,
+        "damageType": "Piercing",
+        "damage": {
+          "count": 2,
+          "sides": 8
+        }
+      },
+      {
+        "name": "Javelin",
+        "bonusToHit": 4,
+        "damageBonus": 2,
+        "damageType": "Piercing",
+        "damage": {
+          "count": 2,
+          "sides": 6
+        }
+      }
+    ],
+    "resistances": []
+  },
+  {
+    "name": "Ochre Jelly",
+    "maxHp": 45,
+    "armorClass": 8,
+    "initiativeModifier": -2,
+    "attacks": [
+      {
+        "name": "Pseudopod",
+        "bonusToHit": 4,
+        "damageBonus": 2,
+        "damageType": "Bludgeoning",
+        "damage": {
+          "count": 2,
+          "sides": 6
+        }
+      },
+      {
+        "name": "Acid Splash",
+        "bonusToHit": 4,
+        "damageBonus": 0,
+        "damageType": "Acid",
+        "damage": {
+          "count": 2,
+          "sides": 6
+        }
+      }
+    ],
+    "resistances": [
+      {
+        "damageType": "Acid",
+        "resistanceLevel": "Resistance"
+      },
+      {
+        "damageType": "Lightning",
+        "resistanceLevel": "Immunity"
+      },
+      {
+        "damageType": "Slashing",
+        "resistanceLevel": "Immunity"
+      }
+    ]
+  },
+  {
+    "name": "Ogre",
+    "maxHp": 59,
+    "armorClass": 11,
+    "initiativeModifier": -1,
+    "attacks": [
+      {
+        "name": "Greatclub",
+        "bonusToHit": 6,
+        "damageBonus": 4,
+        "damageType": "Bludgeoning",
+        "damage": {
+          "count": 2,
+          "sides": 8
+        }
+      },
+      {
+        "name": "Javelin",
+        "bonusToHit": 6,
+        "damageBonus": 4,
+        "damageType": "Piercing",
+        "damage": {
+          "count": 2,
+          "sides": 6
+        }
+      }
+    ],
+    "resistances": []
   }
 ]

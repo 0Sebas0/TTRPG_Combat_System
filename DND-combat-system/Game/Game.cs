@@ -361,6 +361,9 @@ class Game
                                     target = AskTarget(attack);   // null means "Back"
                                 }
                                 while (target == null);
+                                Console.Clear();
+                                Console.Write("\x1b[3J");
+                                _interface.BattleUI(_playerTeam, _enemyTeam, turnOrder, current);
 
                                 PerformAttack(player, attack, target, turnOrderStatic);
                             }
@@ -531,12 +534,14 @@ class Game
             int amount = attacker.RollDamage(attack);
             target.Heal(amount);
             Console.WriteLine($"{attacker.Name} uses {attack.Name} and heals {target.Name} for {amount} HP.");
+            Thread.Sleep(1800);
             return;
         }
 
         if ((attack.DamageType == DamageType.Slow || attack.DamageType == DamageType.Haste) && turnOrderStatic)
         {
             Console.WriteLine($"{attacker.Name} uses {attack.Name} on {target.Name}, but it has no effect yet.");
+            Thread.Sleep(1800);
             return;
         }
 

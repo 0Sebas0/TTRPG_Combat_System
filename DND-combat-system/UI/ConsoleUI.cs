@@ -256,14 +256,22 @@ class UI
 
         Console.Write($"] {c.CurrentHp,3}/{c.MaxHp}");
     }
+    public void ShowActiveStatusEffects<T>(T character) where T : Character
+    {
+        foreach(StatusEffect effect in character.StatusEffects)
+        {
+            Console.Write($"({effect.Type} {effect.Duration}) ");
+        }
+    }
     public void ShowCharacters<T>(LinkedList<T> team) where T : Character
     {
         foreach (T c in team)
         {
             if (!c.IsDown)
             {
-                Console.Write($"{c.Name,-12}[");
+                Console.Write($"{c.Name,-12} AC{c.EffectiveArmorClass} [");
                 ShowHealthBar(c, c.MaxHp);
+                ShowActiveStatusEffects<T>(c);
             }
             else if (!c.IsAlive)
             {
@@ -294,7 +302,7 @@ class UI
         Console.WriteLine("--------------------------------------------------------------");
         ShowTurnOrder(turnOrder);
         Console.WriteLine();
-        if(current.IsAlive)Console.WriteLine($"Its {current.Name}'s turn.");
+        if (current.IsAlive) Console.WriteLine($"Its {current.Name}'s turn.");
         Console.WriteLine();
     }
     public void ShowTurnOrder(Queue<Character> turnOrder)

@@ -2,6 +2,7 @@
 
 using System.Net.Http.Headers;
 using System.Reflection.Metadata.Ecma335;
+using System.Runtime.ExceptionServices;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -328,7 +329,7 @@ class Game
 
                     if (current is Enemy enemy)
                     {
-                        if (enemy.IsAlive)
+                        if (enemy.IsAlive && !enemy.IsIncapacitated)
                         {
                             // TEMPORARY: random target, first attack. Real AI rules come later.
                             List<Character> targets = GetTargets(true, false);
@@ -351,7 +352,7 @@ class Game
                                 Console.WriteLine($"{player.Name} rolled a {roll}.");
                                 Thread.Sleep(2000);
                             }
-                            else
+                            else if(!player.IsIncapacitated)
                             {
                                 Character? target;
                                 Attack attack;
@@ -370,7 +371,13 @@ class Game
                             }
                         }
                     }
-                    //Console.ReadKey();
+                    if (current.StatusEffects.Count > 0 && !(current.StatusEffects.Count == 1 && (current.HasEffect(StatusEffectType.Weakened) || current.HasEffect(StatusEffectType.Poisoned))))
+                    {
+                        current.ManageStatusEffects();
+                        Thread.Sleep(1800);
+                    }
+                    if (current.IsAlive)
+                        Console.ReadKey();
 
                     turnOrder.Dequeue();
 
@@ -549,24 +556,24 @@ class Game
         int roll = attacker.RollToHit(attack);
         Console.WriteLine($"{attacker.Name} attacks {target.Name} with {attack.Name}");
         Thread.Sleep(1800);
-        if (attacker is Player)
-        {
-            Console.WriteLine($"Rolled {roll}.");
-            Thread.Sleep(1800);
-        }
 
+        Console.WriteLine($"Rolled {roll}.");
+        Thread.Sleep(1800);
+
+        int chance = 0;
         if (roll >= target.ArmorClass)
         {
             int damage = attacker.RollDamage(attack);
             if (roll - attack.BonusToHit == 20)
             {
                 damage = 2 * damage;
+                chance = 100;
                 Console.WriteLine("Critical hit!");
             }
             else
                 Console.WriteLine("Attack hits");
             Thread.Sleep(1800);
-            int dealt = target.TakeDamage(damage, attack.DamageType);
+            int dealt = target.TakeDamage(damage, attack.DamageType, chance);
             Console.WriteLine($"{target.Name} takes {dealt} {attack.DamageType} damage");
 
         }
@@ -613,6 +620,7 @@ class Game
         //else game continues
         return 0;
     }
+
 
     public void Run()
     {

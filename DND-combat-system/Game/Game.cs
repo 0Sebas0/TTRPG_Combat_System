@@ -230,12 +230,14 @@ class Game
 
     private void CharacterSelection()
     {
+        const int MaxCharacterCount = 5;
+        int characterCount = 0;
         bool run = true;
         while (run)
         {
             Console.Clear();
             Console.Write("\x1b[3J");
-            _interface.CharacterSelectionUI(_availableCharacters, _playerTeam, _page, PageSize);
+            _interface.CharacterSelectionUI(_availableCharacters, _playerTeam, _page, PageSize, MaxCharacterCount, characterCount);
 
             var key = Console.ReadKey(true);
 
@@ -252,9 +254,10 @@ class Game
 
             int index;
 
-            if (TryGetIndex(key.KeyChar, _availableCharacters.Count, out index) && !IsSelected(_availableCharacters[index]))
+            if (TryGetIndex(key.KeyChar, _availableCharacters.Count, out index) && !IsSelected(_availableCharacters[index]) && characterCount<MaxCharacterCount)
             {
                 _playerTeam.AddLast(_availableCharacters[index].Clone());
+                characterCount++;
             }
 
             char keyBind = char.ToLower(key.KeyChar);
@@ -263,6 +266,7 @@ class Game
             {
                 case 'd':
                     if (_playerTeam.Count > 0) _playerTeam.RemoveLast();
+                    characterCount--;
                     break;
                 case 'i':
                     InspectCharacter(_availableCharacters);
@@ -318,7 +322,7 @@ class Game
             // turns
             while (CheckWinCondition() == 0)
             {
-                for (int i = 0; i < turnOrder.Count; i++)
+                while (turnOrder.Count > 0)
                 {
                     Console.Clear();
                     Console.Write("\x1b[3J");
@@ -332,7 +336,7 @@ class Game
                         if (enemy.IsAlive && !enemy.IsIncapacitated)
                         {
                             // TEMPORARY: random target, first attack. Real AI rules come later.
-                            List<Character> targets = GetTargets(true, false);
+                            List<Character> targets = GetTargets(true);
                             if (targets.Count > 0)
                             {
                                 Character target = targets[Random.Shared.Next(targets.Count)];
@@ -371,7 +375,7 @@ class Game
                             }
                         }
                     }
-                    if (current.StatusEffects.Count > 0 && !(current.StatusEffects.Count == 1 && (current.HasEffect(StatusEffectType.Weakened) || current.HasEffect(StatusEffectType.Poisoned))))
+                    if (current.StatusEffects.Count > 0)
                     {
                         current.ManageStatusEffects();
                         Thread.Sleep(1800);
@@ -454,16 +458,16 @@ class Game
     }
     private void GenerateEnemies()
     {
-        if (Random.Shared.Next(1, 101) == 67)
+        if (Random.Shared.Next(1, 101) < 5) // 5% chance of spawning
         {
-            Attack Scythe = new Attack("Scythe", 3, 3, DamageType.Slashing, new DiceRoll(1, 12));
-            Attack Shitarmagedon = new Attack("Shitarmagedon", 3, 3, DamageType.Acid, new DiceRoll(10, 10));
+            Attack Gynimas = new Attack("Gynimas", 5, 3, DamageType.Piercing, new DiceRoll(1, 12));
+            Attack Kolokviumas = new Attack("Kolokviumas", 5, 3, DamageType.Necrotic, new DiceRoll(3, 12));
             List<Attack> attacks = new List<Attack>();
 
-            attacks.Add(Shitarmagedon);
-            attacks.Add(Scythe);
+            attacks.Add(Gynimas);
+            attacks.Add(Kolokviumas);
 
-            Enemy Boss = new Enemy("SHIT DEMON", 98, 16, 5, attacks, new List<Resistance>());
+            Enemy Boss = new Enemy("Rokas Štrimaitis", 200, 16, 6, attacks, new List<Resistance>());
             _enemyTeam.AddLast(Boss);
             return;
         }
@@ -475,11 +479,11 @@ class Game
             _enemyTeam.AddLast(_availableEnemies[index].Clone());
         }
     }
-    private List<Character> GetTargets(bool allies, bool forHealing)
+    private List<Character> GetTargets(bool players)
     {
         List<Character> targets = new List<Character>();
 
-        if (allies)
+        if (players)
         {
             foreach (Player p in _playerTeam)
             {
@@ -514,8 +518,8 @@ class Game
             char key = char.ToLower(Console.ReadKey(true).KeyChar);
 
             List<Character> targets;
-            if (key == 't') targets = GetTargets(true, healing);
-            else if (key == 'e') targets = GetTargets(false, healing);
+            if (key == 't') targets = GetTargets(true);
+            else if (key == 'e') targets = GetTargets(false);
             else if (key == 'b') return null;
             else continue;
 
@@ -557,11 +561,14 @@ class Game
         Console.WriteLine($"{attacker.Name} attacks {target.Name} with {attack.Name}");
         Thread.Sleep(1800);
 
-        Console.WriteLine($"Rolled {roll}.");
+        Console.Write($"Rolled {roll-attack.BonusToHit}");
+        if (attack.BonusToHit < 0) Console.Write("-");
+        else Console.Write("+");
+        Console.WriteLine($"{attack.BonusToHit}");
         Thread.Sleep(1800);
 
         int chance = 0;
-        if (roll >= target.ArmorClass)
+        if (roll >= target.EffectiveArmorClass)
         {
             int damage = attacker.RollDamage(attack);
             if (roll - attack.BonusToHit == 20)

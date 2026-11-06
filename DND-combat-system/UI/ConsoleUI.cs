@@ -2,13 +2,13 @@
 
 class UI
 {
-    public void CharacterSelectionUI(List<Player> availableCharacters, LinkedList<Player> playerTeam, int page, int pageSize)
+    public void CharacterSelectionUI(List<Player> availableCharacters, LinkedList<Player> playerTeam, int page, int pageSize, int MaxCharacterCount, int characterCount)
     {
         Console.WriteLine("-------------------- SELECT YOUR FIGHTERS --------------------");
         ShowAvailableCharacters(availableCharacters, playerTeam, page, pageSize);
         Console.WriteLine("--------------------------------------------------------------");
         Console.WriteLine();
-        ShowChosencharacters(playerTeam);
+        ShowChosencharacters(playerTeam, MaxCharacterCount, characterCount);
         Console.WriteLine();
         Console.WriteLine("--------------------------------------------------------------");
         ShowCharacterSelectionControls(availableCharacters, page, pageSize);
@@ -49,9 +49,9 @@ class UI
         Console.WriteLine();
         Console.WriteLine($"Page {page + 1}/{pageCount}");
     }
-    public void ShowChosencharacters(LinkedList<Player> playerTeam)
+    public void ShowChosencharacters(LinkedList<Player> playerTeam, int MaxCharacterCount, int characterCount)
     {
-        Console.Write("Your team: ");
+        Console.Write($"Your team ({characterCount}/{MaxCharacterCount}): ");
         foreach (Player character in playerTeam)
         {
             Console.Write($"[{character.Name}] ");
@@ -235,6 +235,7 @@ class UI
     }
     public void ShowHealthBar<T>(T c, int width) where T : Character
     {
+        width = Math.Min(width, 100);
         double ratio = (double)c.CurrentHp / c.MaxHp;
         int filled = (int)Math.Round(ratio * width);
 

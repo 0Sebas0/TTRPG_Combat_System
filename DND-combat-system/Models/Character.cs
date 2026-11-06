@@ -54,7 +54,7 @@ abstract class Character
     }
 
     public abstract Character Clone();
-    public int TakeDamage(int amount, DamageType type, int chance = 0)
+    public int TakeDamage(int amount, DamageType type, int chance)
     {
         if (amount < 0) return 0;
         int finalDamage = amount;
@@ -87,26 +87,26 @@ abstract class Character
             switch (type)
             {
                 case DamageType.Acid:
-                    if (chance <= 100) AddStatus(StatusEffectType.Weakened);
-                    if (chance <= 100) AddStatus(StatusEffectType.Poisoned);
+                    if (chance <= 15 || chance == 100) AddStatus(StatusEffectType.Weakened);
+                    if (chance <= 20 || chance == 100) AddStatus(StatusEffectType.Poisoned);
                     break;
                 case DamageType.Necrotic:
-                    if (chance <= 100) AddStatus(StatusEffectType.Weakened);
+                    if (chance <= 25 || chance == 100) AddStatus(StatusEffectType.Weakened);
                     break;
                 case DamageType.Poison:
-                    if (chance <= 100) AddStatus(StatusEffectType.Poisoned);
+                    if (chance <= 20 || chance == 100) AddStatus(StatusEffectType.Poisoned);
                     break;
                 case DamageType.Piercing:
-                    if (chance <= 100) AddStatus(StatusEffectType.Bleeding);
+                    if (chance <= 20 || chance == 100) AddStatus(StatusEffectType.Bleeding);
                     break;
                 case DamageType.Slashing:
-                    if (chance <= 100) AddStatus(StatusEffectType.Bleeding);
+                    if (chance <= 10 || chance == 100) AddStatus(StatusEffectType.Bleeding);
                     break;
                 case DamageType.Bludgeoning:
-                    if (chance <= 100) AddStatus(StatusEffectType.Stunned);
+                    if (chance <= 30 || chance == 100) AddStatus(StatusEffectType.Stunned);
                     break;
                 case DamageType.Lightning:
-                    if (chance <= 100) AddStatus(StatusEffectType.Stunned);
+                    if (chance <= 40 || chance == 100) AddStatus(StatusEffectType.Stunned);
                     break;
             }
         }
@@ -165,7 +165,7 @@ abstract class Character
         switch (type)
         {
             case StatusEffectType.Stunned:
-                turns = Random.Shared.Next(1, 2); break;
+                turns = Random.Shared.Next(1, 3); break;
             case StatusEffectType.Bleeding:
                 turns = Random.Shared.Next(2, 5); break;
             case StatusEffectType.Poisoned:

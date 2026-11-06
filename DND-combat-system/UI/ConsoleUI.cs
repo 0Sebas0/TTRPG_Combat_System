@@ -272,6 +272,7 @@ class UI
             {
                 Console.Write($"{c.Name,-12} AC{c.EffectiveArmorClass} [");
                 ShowHealthBar(c, c.MaxHp);
+                Console.Write(' ');
                 ShowActiveStatusEffects<T>(c);
             }
             else if (!c.IsAlive)

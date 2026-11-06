@@ -38,8 +38,20 @@
     ],
     "resistances": [
       {
-        "damageType": "Poison",
+        "damageType": "Bludgeoning",
+        "resistanceLevel": "Immunity"
+      },
+      {
+        "damageType": "Slashing",
         "resistanceLevel": "Resistance"
+      },
+      {
+        "damageType": "Piercing",
+        "resistanceLevel": "Resistance"
+      },
+      {
+        "damageType": "Poison",
+        "resistanceLevel": "Vulnerability"
       }
     ]
   },
@@ -93,6 +105,10 @@
     "resistances": [
       {
         "damageType": "Lightning",
+        "resistanceLevel": "Resistance"
+      },
+      {
+        "damageType": "Fire",
         "resistanceLevel": "Resistance"
       }
     ]
@@ -171,6 +187,10 @@
       {
         "damageType": "Radiant",
         "resistanceLevel": "Resistance"
+      },
+      {
+        "damageType": "Slashing",
+        "resistanceLevel": "Vulnerability"
       }
     ]
   },
@@ -215,6 +235,10 @@
       {
         "damageType": "Fire",
         "resistanceLevel": "Resistance"
+      },
+      {
+        "damageType": "Poison",
+        "resistanceLevel": "Vulnerability"
       }
     ]
   }

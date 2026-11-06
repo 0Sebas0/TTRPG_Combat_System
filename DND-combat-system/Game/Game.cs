@@ -254,7 +254,7 @@ class Game
 
             int index;
 
-            if (TryGetIndex(key.KeyChar, _availableCharacters.Count, out index) && !IsSelected(_availableCharacters[index]) && characterCount<MaxCharacterCount)
+            if (TryGetIndex(key.KeyChar, _availableCharacters.Count, out index) && !IsSelected(_availableCharacters[index]) && characterCount < MaxCharacterCount)
             {
                 _playerTeam.AddLast(_availableCharacters[index].Clone());
                 characterCount++;
@@ -335,12 +335,21 @@ class Game
                     {
                         if (enemy.IsAlive && !enemy.IsIncapacitated)
                         {
-                            // TEMPORARY: random target, first attack. Real AI rules come later.
-                            List<Character> targets = GetTargets(true);
-                            if (targets.Count > 0)
+                            EnemyAction? action = enemy.Decide(_playerTeam, _enemyTeam);
+                            if (action == null)
                             {
-                                Character target = targets[Random.Shared.Next(targets.Count)];
-                                PerformAttack(enemy, enemy.Attacks[0], target, turnOrderStatic);
+                                Console.WriteLine($"{enemy.Name} has nothing useful to do.");
+                                Thread.Sleep(1800);
+                            }
+                            else
+                            {
+                                if (action.Reason != "")
+                                {
+                                    Console.WriteLine($"{enemy.Name} {action.Reason}.");
+                                    Thread.Sleep(1800);
+                                }
+                                AttackResult result = PerformAttack(enemy, action.Attack, action.Target, turnOrderStatic);
+                                enemy.Learn(action, result);
                             }
                         }
                     }
@@ -356,7 +365,7 @@ class Game
                                 Console.WriteLine($"{player.Name} rolled a {roll}.");
                                 Thread.Sleep(2000);
                             }
-                            else if(!player.IsIncapacitated)
+                            else if (!player.IsIncapacitated)
                             {
                                 Character? target;
                                 Attack attack;
@@ -381,6 +390,8 @@ class Game
                         Thread.Sleep(1800);
                     }
                     if (current.IsAlive)
+                        Console.WriteLine();
+                        Console.WriteLine("Press any key to continue");
                         Console.ReadKey();
 
                     turnOrder.Dequeue();
@@ -539,7 +550,7 @@ class Game
             }
         }
     }
-    private void PerformAttack(Character attacker, Attack attack, Character target, bool turnOrderStatic)
+    private AttackResult PerformAttack(Character attacker, Attack attack, Character target, bool turnOrderStatic)
     {
         if (attack.DamageType == DamageType.Heal)
         {
@@ -547,28 +558,31 @@ class Game
             target.Heal(amount);
             Console.WriteLine($"{attacker.Name} uses {attack.Name} and heals {target.Name} for {amount} HP.");
             Thread.Sleep(1800);
-            return;
+            return new AttackResult(true, amount, amount);
         }
 
         if ((attack.DamageType == DamageType.Slow || attack.DamageType == DamageType.Haste) && turnOrderStatic)
         {
             Console.WriteLine($"{attacker.Name} uses {attack.Name} on {target.Name}, but it has no effect yet.");
             Thread.Sleep(1800);
-            return;
+            return new AttackResult(false, 0, 0);
         }
 
         int roll = attacker.RollToHit(attack);
         Console.WriteLine($"{attacker.Name} attacks {target.Name} with {attack.Name}");
         Thread.Sleep(1800);
 
-        Console.Write($"Rolled {roll-attack.BonusToHit}");
+        Console.Write($"Rolled {roll - attack.BonusToHit}");
         if (attack.BonusToHit < 0) Console.Write("-");
         else Console.Write("+");
         Console.WriteLine($"{attack.BonusToHit}");
         Thread.Sleep(1800);
 
         int chance = 0;
-        if (roll >= target.EffectiveArmorClass)
+        int rawDamage = 0;
+        int dealt = 0;
+        bool hit = roll >= target.EffectiveArmorClass;
+        if (hit)
         {
             int damage = attacker.RollDamage(attack);
             if (roll - attack.BonusToHit == 20)
@@ -580,7 +594,8 @@ class Game
             else
                 Console.WriteLine("Attack hits");
             Thread.Sleep(1800);
-            int dealt = target.TakeDamage(damage, attack.DamageType, chance);
+            rawDamage = damage;   // the number BEFORE resistances are applied
+            dealt = target.TakeDamage(damage, attack.DamageType, chance);
             Console.WriteLine($"{target.Name} takes {dealt} {attack.DamageType} damage");
 
         }
@@ -589,6 +604,7 @@ class Game
             Console.WriteLine("Attack missess");
         }
         Thread.Sleep(2000);
+        return new AttackResult(hit, rawDamage, dealt);
     }
 
     private void CleanUpTheDead<T>(LinkedList<T> team) where T : Character

@@ -30,7 +30,7 @@ abstract class Character
             int einitiative = Initiative;
             if (HasEffect(StatusEffectType.Slowed))
                 einitiative -= 10;
-            else if (HasEffect(StatusEffectType.Slowed))
+            else if (HasEffect(StatusEffectType.Haste))
                 einitiative += 10;
             return einitiative;
         }
@@ -124,7 +124,7 @@ abstract class Character
                     AddStatus(StatusEffectType.Slowed);
                     break;
                 case DamageType.Haste:
-                    AddStatus(StatusEffectType.Slowed);
+                    AddStatus(StatusEffectType.Haste);
                     break;
             }
         }

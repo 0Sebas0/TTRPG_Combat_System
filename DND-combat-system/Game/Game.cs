@@ -266,7 +266,7 @@ class Game
             {
                 case 'd':
                     if (_playerTeam.Count > 0) _playerTeam.RemoveLast();
-                    characterCount--;
+                    if (characterCount > 0) characterCount--;
                     break;
                 case 'i':
                     InspectCharacter(_availableCharacters);
@@ -289,6 +289,7 @@ class Game
                     break;
             }
         }
+        characterCount = 0;
     }
 
     private bool AskTurnOrder()
@@ -405,37 +406,11 @@ class Game
                     }
                 }
             }
-            if (CheckWinCondition() == 1)
-            {
-                Console.Clear();
-                Console.Write("\x1b[3J");
-                _interface.BattleUI(_playerTeam, _enemyTeam, new Queue<Character>(), _playerTeam.First());
-                Console.WriteLine("------ You Won :D ------");
-                Console.WriteLine();
-                Console.WriteLine("Press any key to go back to main menu.");
-            }
-            else if (CheckWinCondition() == -1)
-            {
-                Console.Clear();
-                Console.Write("\x1b[3J");
-                _interface.BattleUI(_playerTeam, _enemyTeam, new Queue<Character>(), _enemyTeam.First());
-                Console.WriteLine("------ You Lost :( ------");
-                Console.WriteLine();
-                Console.WriteLine("Press any key to go back to main menu.");
-            }
-            Console.ReadKey();
-
         }
         else if (!turnOrderStatic)
         {
             CircularLinkedList<Character> turnOrder = CreateCricularList();
             LinkedListNode<Character> current = turnOrder.First;
-
-            if (current.Value.StatusEffects.Count > 0)
-            {
-                current.Value.ManageStatusEffects();
-                Thread.Sleep(1800);
-            }
 
             while (CheckWinCondition() == 0)
             {
@@ -501,35 +476,48 @@ class Game
                             }
                         }
 
-                        if (current.Value.IsAlive)
-                            Console.WriteLine();
-                        Console.WriteLine("Press any key to continue");
-                        Console.ReadKey();
-
-
-                        if (current.Value.HasEffect(StatusEffectType.Slowed) || current.Value.HasEffect(StatusEffectType.Haste))
-                        {
-                            LinkedListNode<Character> iterator = turnOrder.First;
-                            while(true)
-                            {
-                                if(iterator == current)
-                                {
-                                    current = iterator;
-                                    break;
-                                }
-                                iterator = turnOrder.NextOf(iterator);
-                            }
-
-                            turnOrder = CreateCricularList();
-                        }
-                        current = turnOrder.NextOf(current);
-                        CleanUpTheDead<Enemy>(_enemyTeam);
                     }
+                    if (current.Value.StatusEffects.Count > 0)
+                    {
+                        current.Value.ManageStatusEffects();
+                        Console.WriteLine();
+                    }
+                    if (current.Value.IsAlive)
+                        Console.WriteLine();
+                    Console.WriteLine("Press any key to continue");
+                    Console.ReadKey();
+
+                    Character actor = current.Value;
+                    turnOrder = CreateCricularList();
+                    LinkedListNode<Character>? actorNode = turnOrder.Find(actor);   // search by character
+                    current = actorNode != null ? turnOrder.NextOf(actorNode) : turnOrder.First!;
+
+                    CleanUpTheDead<Enemy>(_enemyTeam);
                 }
-                _enemyTeam.Clear();
-                _playerTeam.Clear();
+                
             }
         }
+        if (CheckWinCondition() == 1)
+        {
+            Console.Clear();
+            Console.Write("\x1b[3J");
+            _interface.BattleUI(_playerTeam, _enemyTeam, new Queue<Character>(), _playerTeam.First());
+            Console.WriteLine("------ You Won :D ------");
+            Console.WriteLine();
+            Console.WriteLine("Press any key to go back to main menu.");
+        }
+        else if (CheckWinCondition() == -1)
+        {
+            Console.Clear();
+            Console.Write("\x1b[3J");
+            _interface.BattleUI(_playerTeam, _enemyTeam, new Queue<Character>(), _enemyTeam.First());
+            Console.WriteLine("------ You Lost :( ------");
+            Console.WriteLine();
+            Console.WriteLine("Press any key to go back to main menu.");
+        }
+        Console.ReadKey();
+        _enemyTeam.Clear();
+        _playerTeam.Clear();
     }
     private Queue<Character> CreateQueue()
     {

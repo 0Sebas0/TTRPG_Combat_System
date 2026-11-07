@@ -307,7 +307,31 @@ class UI
         if (current.IsAlive) Console.WriteLine($"Its {current.Name}'s turn.");
         Console.WriteLine();
     }
+    public void BattleUI(LinkedList<Player> playerTeam, LinkedList<Enemy> enemyTeam, CircularLinkedList<Character> turnOrder, Character current)
+    {
+        Console.WriteLine("--------------------------- BATTLE ---------------------------");
+        Console.WriteLine();
+        ShowCharacters(enemyTeam);
+        Console.WriteLine();
+        Console.WriteLine();
+        ShowCharacters(playerTeam);
+        Console.WriteLine();
+        Console.WriteLine("--------------------------------------------------------------");
+        ShowTurnOrder(turnOrder);
+        Console.WriteLine();
+        if (current.IsAlive) Console.WriteLine($"Its {current.Name}'s turn.");
+        Console.WriteLine();
+    }
     public void ShowTurnOrder(Queue<Character> turnOrder)
+    {
+        Console.Write("Turn Order: ");
+        foreach (Character character in turnOrder)
+        {
+            Console.Write($"[{character.Name}] ");
+        }
+        Console.WriteLine();
+    }
+    public void ShowTurnOrder(CircularLinkedList<Character> turnOrder)
     {
         Console.Write("Turn Order: ");
         foreach (Character character in turnOrder)

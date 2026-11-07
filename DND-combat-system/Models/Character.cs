@@ -23,6 +23,18 @@ abstract class Character
     public List<Resistance> Resistances { get; }
     [JsonIgnore] public LinkedList<StatusEffect> StatusEffects { get; protected set; }
     [JsonIgnore] public int Initiative { get; protected set; }
+    [JsonIgnore] public int EffectiveInitiative
+    {
+        get
+        {
+            int einitiative = Initiative;
+            if (HasEffect(StatusEffectType.Slowed))
+                einitiative -= 10;
+            else if (HasEffect(StatusEffectType.Slowed))
+                einitiative += 10;
+            return einitiative;
+        }
+    }
     public int InitiativeModifier { get; }
     [JsonIgnore] public bool IsDown => CurrentHp <= 0;
     [JsonIgnore] public virtual bool IsAlive => CurrentHp > 0;
@@ -80,7 +92,7 @@ abstract class Character
                 break;
             }
         }
-        if (finalDamage > 0)
+        if (finalDamage > 0 || type == DamageType.Haste || type == DamageType.Slow)
         {
             if (chance == 0)
                 chance = Random.Shared.Next(1, 101);
@@ -107,6 +119,12 @@ abstract class Character
                     break;
                 case DamageType.Lightning:
                     if (chance <= 40 || chance == 100) AddStatus(StatusEffectType.Stunned);
+                    break;
+                case DamageType.Slow:
+                    AddStatus(StatusEffectType.Slowed);
+                    break;
+                case DamageType.Haste:
+                    AddStatus(StatusEffectType.Slowed);
                     break;
             }
         }
@@ -172,6 +190,10 @@ abstract class Character
                 turns = Random.Shared.Next(2, 5); break;
             case StatusEffectType.Weakened:
                 turns = Random.Shared.Next(2, 5); break;
+            case StatusEffectType.Slowed:
+                turns = 3; break;
+            case StatusEffectType.Haste:
+                turns = 3; break;
             default:
                 turns = 0; break;
         }

@@ -392,8 +392,8 @@ class Game
                     }
                     if (current.IsAlive)
                         Console.WriteLine();
-                        Console.WriteLine("Press any key to continue");
-                        Console.ReadKey();
+                    Console.WriteLine("Press any key to continue");
+                    Console.ReadKey();
 
                     turnOrder.Dequeue();
 
@@ -428,10 +428,108 @@ class Game
         }
         else if (!turnOrderStatic)
         {
-            //TO BE DONE
+            CircularLinkedList<Character> turnOrder = CreateCricularList();
+            LinkedListNode<Character> current = turnOrder.First;
+
+            if (current.Value.StatusEffects.Count > 0)
+            {
+                current.Value.ManageStatusEffects();
+                Thread.Sleep(1800);
+            }
+
+            while (CheckWinCondition() == 0)
+            {
+                // One Round loop
+                while (CheckWinCondition() == 0)
+                {
+                    Console.Clear();
+                    Console.Write("\x1b[3J");
+                    if (CheckWinCondition() != 0) break;
+
+                    _interface.BattleUI(_playerTeam, _enemyTeam, turnOrder, current.Value);
+
+                    if (current.Value is Enemy enemy)
+                    {
+                        if (enemy.IsAlive && !enemy.IsIncapacitated)
+                        {
+                            EnemyAction? action = enemy.Decide(_playerTeam, _enemyTeam);
+                            if (action == null)
+                            {
+                                Console.WriteLine($"{enemy.Name} has nothing useful to do.");
+                                Thread.Sleep(1800);
+                            }
+                            else
+                            {
+                                if (action.Reason != "")
+                                {
+                                    Console.WriteLine($"{enemy.Name} {action.Reason}.");
+                                    Thread.Sleep(1800);
+                                }
+                                AttackResult result = PerformAttack(enemy, action.Attack, action.Target, turnOrderStatic);
+                                enemy.Learn(action, result);
+                            }
+                        }
+                    }
+                    else if (current.Value is Player player)
+                    {
+                        if (player.IsAlive)
+                        {
+                            if (player.IsDown)
+                            {
+                                int roll = player.RollDeathSave();
+                                Console.WriteLine($"{player.Name} is down and rolls a death save.");
+                                Thread.Sleep(1800);
+                                Console.WriteLine($"{player.Name} rolled a {roll}.");
+                                Thread.Sleep(2000);
+                            }
+                            else if (!player.IsIncapacitated)
+                            {
+                                Character? target;
+                                Attack attack;
+                                do
+                                {
+                                    _interface.ShowCharacterAttacks(player, turnOrderStatic);
+                                    attack = AskAttack(player);
+                                    target = AskTarget(attack);   // null means "Back"
+                                }
+                                while (target == null);
+                                Console.Clear();
+                                Console.Write("\x1b[3J");
+                                _interface.BattleUI(_playerTeam, _enemyTeam, turnOrder, current.Value);
+
+                                PerformAttack(player, attack, target, turnOrderStatic);
+                            }
+                        }
+
+                        if (current.Value.IsAlive)
+                            Console.WriteLine();
+                        Console.WriteLine("Press any key to continue");
+                        Console.ReadKey();
+
+
+                        if (current.Value.HasEffect(StatusEffectType.Slowed) || current.Value.HasEffect(StatusEffectType.Haste))
+                        {
+                            LinkedListNode<Character> iterator = turnOrder.First;
+                            while(true)
+                            {
+                                if(iterator == current)
+                                {
+                                    current = iterator;
+                                    break;
+                                }
+                                iterator = turnOrder.NextOf(iterator);
+                            }
+
+                            turnOrder = CreateCricularList();
+                        }
+                        current = turnOrder.NextOf(current);
+                        CleanUpTheDead<Enemy>(_enemyTeam);
+                    }
+                }
+                _enemyTeam.Clear();
+                _playerTeam.Clear();
+            }
         }
-        _enemyTeam.Clear();
-        _playerTeam.Clear();
     }
     private Queue<Character> CreateQueue()
     {
@@ -456,6 +554,29 @@ class Game
         }
         return queue;
 
+    }
+    private CircularLinkedList<Character> CreateCricularList()
+    {
+        List<Character> list = new List<Character>();
+        CircularLinkedList<Character> cll = new CircularLinkedList<Character>();
+
+        foreach (Character character in _playerTeam)
+        {
+            list.Add(character);
+        }
+        foreach (Character character in _enemyTeam)
+        {
+            list.Add(character);
+        }
+
+        list.Sort((a, b) => b.EffectiveInitiative.CompareTo(a.EffectiveInitiative));
+
+        foreach (Character character in list)
+        {
+            if (character.IsAlive)
+                cll.AddLast(character);
+        }
+        return cll;
     }
     private void RollForInitiative()
     {
@@ -562,9 +683,10 @@ class Game
             return new AttackResult(true, amount, amount);
         }
 
-        if ((attack.DamageType == DamageType.Slow || attack.DamageType == DamageType.Haste) && turnOrderStatic)
+        if ((attack.DamageType == DamageType.Slow || attack.DamageType == DamageType.Haste) && !turnOrderStatic)
         {
-            Console.WriteLine($"{attacker.Name} uses {attack.Name} on {target.Name}, but it has no effect yet.");
+            Console.WriteLine($"{attacker.Name} uses {attack.Name} on {target.Name}, {target.Name} is {attack.DamageType}ed");
+            target.TakeDamage(0, attack.DamageType, 100);
             Thread.Sleep(1800);
             return new AttackResult(false, 0, 0);
         }

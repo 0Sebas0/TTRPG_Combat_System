@@ -283,13 +283,13 @@ class Game
                     break;
                 case 'p':
                     if (_playerTeam.Count > 0) Battle();
+                    characterCount = 0;
                     break;
                 case 'e':
                     run = false;
                     break;
             }
         }
-        characterCount = 0;
     }
 
     private bool AskTurnOrder()
@@ -754,7 +754,7 @@ class Game
         //else game continues
         return 0;
     }
-
+    
 
     public void Run()
     {

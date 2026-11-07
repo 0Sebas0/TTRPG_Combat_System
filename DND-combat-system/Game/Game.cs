@@ -322,6 +322,7 @@ class Game
             // turns
             while (CheckWinCondition() == 0)
             {
+                // One Round loop
                 while (turnOrder.Count > 0)
                 {
                     Console.Clear();
@@ -427,7 +428,7 @@ class Game
         }
         else if (!turnOrderStatic)
         {
-
+            //TO BE DONE
         }
         _enemyTeam.Clear();
         _playerTeam.Clear();

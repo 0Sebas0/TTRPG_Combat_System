@@ -5,7 +5,7 @@ namespace RpgBattle;
 
 class Enemy : Character
 {
-    // ---------- Tuning knobs: change these to change the enemy's "personality" ----------
+    // ---------- change these to change the enemy's "personality" ----------
     private const double HealBelowHpRatio = 0.4;   
     private const double MassiveDamageRatio = 0.4; 
     private const double MinFinishHitChance = 0.4; 
